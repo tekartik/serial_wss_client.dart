@@ -3,12 +3,11 @@ import 'package:web_socket_channel/html.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class BrowserWebSocketChannelFactory extends WebSocketChannelFactory {
-
   @override
   WebSocketChannel create(String url) {
     return new HtmlWebSocketChannel.connect(url);
   }
 }
 
-final BrowserWebSocketChannelFactory browserWebSocketChannelFactory = new BrowserWebSocketChannelFactory();
-
+final BrowserWebSocketChannelFactory browserWebSocketChannelFactory =
+    new BrowserWebSocketChannelFactory();

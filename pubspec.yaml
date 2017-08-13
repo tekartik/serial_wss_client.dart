@@ -21,3 +21,11 @@ dev_dependencies:
   tekartik_test_menu:
     git: git://github.com/tekartik/test_menu.dart
     version: '>=0.3.1'
+  tekartik_serial_wss_sim:
+    git: git://github.com/tekartik/serial_wss_sim.dart
+  chrome_travis:
+    git: git://github.com/tekartik/chrome_travis.dart
+
+dependency_overrides:
+#  tekartik_serial_wss_sim:
+#    path: ../serial_wss_sim.dart

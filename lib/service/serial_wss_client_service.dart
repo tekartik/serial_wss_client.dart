@@ -30,7 +30,8 @@ class SerialWssClientService {
   SerialWssClientService(WebSocketChannelFactory factory,
       {String url, SerialClientInfo clientInfo, Duration retryDelay})
       : clientInfo = clientInfo,
-        _factory = factory, _connectedController = new StreamController.broadcast() {
+        _factory = factory,
+        _connectedController = new StreamController.broadcast() {
     _url = url ?? serialWssUrlDefault;
     this.retryDelay = retryDelay ?? new Duration(seconds: 3);
   }

@@ -1,4 +1,3 @@
-
 const methodInit = 'init'; // request optional params are name (client name)
 
 const methodGetDevices = 'getDevices'; // request
@@ -10,6 +9,7 @@ const methodFlush = 'flush'; // request
 const methodReceive = 'recv'; // notification
 
 const methodInfo = 'info'; // from server upon connection, notification
+
 abstract class Message {
   Map<String, dynamic> toMap() {
     return {"jsonrpc": "2.0"};
@@ -30,9 +30,13 @@ abstract class Message {
         } else {
           Map errorMap = map['error'];
           if (errorMap == null) {
-            throw new FormatException("missing 'method', 'result' or 'error' in $map");
+            throw new FormatException(
+                "missing 'method', 'result' or 'error' in $map");
           }
-          return new ErrorResponse(id, new Error(errorMap['code'], errorMap['message'], errorMap['data']));
+          return new ErrorResponse(
+              id,
+              new Error(
+                  errorMap['code'], errorMap['message'], errorMap['data']));
         }
       } else {
         return new Request(id, map['method'], map['params']);
@@ -46,7 +50,6 @@ abstract class Message {
     }
   }
 }
-
 
 abstract class _MessageWithId extends Message {
   final id;
@@ -90,6 +93,7 @@ class _RequestMixin {
     }
   }
 }
+
 class Request extends _MessageWithId with _RequestMixin {
   Request(id, String method, [var params]) : super(id) {
     _init(method, params);
@@ -135,6 +139,7 @@ class Error {
     return "$code: $message${data != null ? " $data" : ""}";
   }
 }
+
 class ErrorResponse extends _MessageWithId {
   final Error error;
   ErrorResponse(id, this.error) : super(id);

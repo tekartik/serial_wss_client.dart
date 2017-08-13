@@ -118,6 +118,7 @@ class ConnectionOptions {
   fromMap(Map map) {
     bitrate = map["bitrate"];
   }
+
   Map toMap() {
     Map map = {};
     if (bitrate != null) {
@@ -168,7 +169,6 @@ See ConnectionOptions.ctsFlowControl. This field may be omitted if an error occu
 class ConnectionInfo extends ConnectionOptions {
   int connectionId;
 
-
   fromMap(Map map) {
     super.fromMap(map);
     connectionId = map["connectionId"];
@@ -212,6 +212,7 @@ class SendInfo {
     bytesSent = map["bytesSent"];
     error = map["error"];
   }
+
   Map toMap() {
     Map map = {};
     map['bytesSent'] = bytesSent;
@@ -251,7 +252,8 @@ class _SerialStreamSink implements StreamSink<List<int>> {
 
   @override
   void add(List<int> data) {
-    channel._serial.send(channel.info.connectionId, new Uint8List.fromList(data));
+    channel._serial
+        .send(channel.info.connectionId, new Uint8List.fromList(data));
   }
 
   @override
@@ -305,11 +307,12 @@ class SerialStreamChannel extends StreamChannelMixin<List<int>> {
   Future close() async {
     await sink.close();
   }
+
   _close() async {
     await _streamController.close();
     _sink._close();
   }
-  
+
   int get connectionId => info.connectionId;
 
   @override
@@ -342,7 +345,6 @@ class Serial {
   //Stream<List<int>> get onReceive => _onReceiveController.stream;
 
   Map<int, SerialStreamChannel> _serialStreamChannels = {};
-
 
   Func1 _onDataReceived;
   Func1 _onDataSent;
@@ -575,13 +577,12 @@ class Serial {
   }
 
   Future<SerialStreamChannel> createChannel(String path,
-  {ConnectionOptions options}) async {
+      {ConnectionOptions options}) async {
     ConnectionInfo info = await connect(path, options: options);
 
-      var serialStreamChannel = new SerialStreamChannel._(this, info);
-      _serialStreamChannels[info.connectionId] = serialStreamChannel;
-      return serialStreamChannel;
-
+    var serialStreamChannel = new SerialStreamChannel._(this, info);
+    _serialStreamChannels[info.connectionId] = serialStreamChannel;
+    return serialStreamChannel;
   }
 
   Future<ConnectionInfo> connect(String path,
@@ -600,7 +601,6 @@ class Serial {
       throw new Exception("connection failed");
     }
     return info;
-
   }
 
   Future<bool> disconnect(int connectionId) async {
@@ -615,7 +615,6 @@ class Serial {
     serialStreamChannel._close();
     _serialStreamChannels[connectionId] = null;
 
-
     return response.result;
   }
 
@@ -628,8 +627,6 @@ class Serial {
 
     return response.result;
   }
-
-
 
   Future<SendInfo> send(int connectionId, List<int> data) async {
     // send String {"jsonrpc":"2.0","id":5,"method":"send","params":{"connectionId":4,"data":"68656C6C6F2066726F6D20636C69656E74"}}

@@ -90,9 +90,11 @@ main() {
         expect(response.result, ["value"]);
       });
       test('error_response', () {
-        ErrorResponse response = Message.parseMap( {"jsonrpc": "2.0",
-            "id": 1,
-            "error": {"code": 2, "message": "msg",  "data": "err_data"}});
+        ErrorResponse response = Message.parseMap({
+          "jsonrpc": "2.0",
+          "id": 1,
+          "error": {"code": 2, "message": "msg", "data": "err_data"}
+        });
 
         expect(response.id, 1);
         expect(response.error.code, 2);
