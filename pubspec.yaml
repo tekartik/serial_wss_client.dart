@@ -1,0 +1,23 @@
+name: tekartik_serial_wss_client
+description: A starting point for Dart libraries or applications.
+version: 0.0.1
+#homepage: https://www.example.com
+#author: alex <email@example.com>
+
+environment:
+  sdk: '>=1.20.1 <2.0.0'
+
+dependencies:
+  func: any
+  event_bus: any
+  web_socket_channel: any
+  tekartik_common_utils:
+    git: git://github.com/tekartik/common_utils.dart
+    version: '>=0.4.4'
+
+dev_dependencies:
+  test: any
+  dev_test: any
+  tekartik_test_menu:
+    git: git://github.com/tekartik/test_menu.dart
+    version: '>=0.3.1'
