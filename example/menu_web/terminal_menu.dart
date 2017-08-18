@@ -81,11 +81,6 @@ terminalMenu() {
     serial.close();
   });
 
-  item('send_test', () async {
-    await _connect();
-    serial.test();
-  });
-
   item('getDevices', () async {
     await _connect();
     List<DeviceInfo> deviceInfos = await serial.getDevices();

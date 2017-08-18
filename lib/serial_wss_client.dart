@@ -23,6 +23,9 @@ Version minVersion = new Version(0, 3, 0);
 const int _maxQueryId = 10000;
 const Duration requestTimeoutDuration = const Duration(milliseconds: 5000);
 
+// Broadcast when serial is done
+class _SerialDoneEvent {}
+
 // Data broadcasted to listener
 class _SerialDataMapEvent {
   Map<String, dynamic> data;
@@ -281,7 +284,12 @@ class _SerialStreamSink implements StreamSink<List<int>> {
 
   @override
   Future close() async {
-    await channel._serial.disconnect(channel.info.connectionId);
+    try {
+      await channel._serial.disconnect(channel.info.connectionId);
+    } catch (e) {
+      print("close error: $e");
+    }
+    await _close();
   }
 }
 
@@ -289,12 +297,13 @@ class _SerialStreamSink implements StreamSink<List<int>> {
 // serial connection
 class SerialStreamChannel extends StreamChannelMixin<List<int>> {
   final Serial _serial;
+  final String path;
   final ConnectionInfo info;
   StreamController<List<int>> _streamController = new StreamController();
 
   _SerialStreamSink _sink;
 
-  SerialStreamChannel._(this._serial, this.info) {
+  SerialStreamChannel._(this._serial, this.path, this.info) {
     _sink = new _SerialStreamSink(this);
   }
 
@@ -316,10 +325,15 @@ class SerialStreamChannel extends StreamChannelMixin<List<int>> {
   int get connectionId => info.connectionId;
 
   @override
-  String toString() => info.toString();
+  String toString() => "$path $info";
 }
 
 class Serial {
+  static bool _debug = false;
+  static bool get debug => _debug;
+  @deprecated
+  static set debug(bool debug) => _debug = debug;
+
   StreamChannel _streamChannel;
   bool _done = false;
 
@@ -338,6 +352,8 @@ class Serial {
   Completer<bool> _connectedCompleter = new Completer();
   EventBus _eventBus = new EventBus();
   bool _connected = false;
+
+  bool get isConnected => _connected;
 
   Duration commandTimeOutDuration = new Duration(seconds: 5);
 
@@ -413,6 +429,9 @@ class Serial {
     });
 
     _streamChannel.stream.listen((data) {
+      if (debug) {
+        print("[Serial] recv($data)");
+      }
       //devPrint("recv: $data");
 
       if (_onDataReceived != null) {
@@ -430,6 +449,9 @@ class Serial {
         _eventBus.fire(new _SerialDataMapEvent(map));
       }
     }, onError: (error) {
+      if (debug) {
+        print("[Serial] onError($error)");
+      }
       //devError(error);
       if (onError != null) {
         onError(error);
@@ -438,8 +460,12 @@ class Serial {
         _connectedCompleter.completeError(error);
       }
     }, onDone: () {
-      //devPrint("onDone");
+      if (debug) {
+        print("[Serial] onDone");
+      }
+      _eventBus.fire(new _SerialDoneEvent());
       _done = true;
+      _connected = false;
       if (onDone != null) {
         onDone();
       }
@@ -490,18 +516,17 @@ class Serial {
   Future<bool> get connected => _connectedCompleter.future;
 
   sendMessage(Message message) {
-    //devPrint("send: ${message.toMap()}");
+    if (debug) {
+      print("[Serial] send: ${message.toMap()}");
+    }
     String data = JSON.encode(message.toMap());
     if (_onDataSent != null) {
       _onDataSent(data);
     }
     _streamChannel.sink.add(data);
-  }
-
-  Future test() async {
-    int commandId = _nextRequestId;
-
-    sendMessage(new Request(commandId, 'list'));
+    if (debug) {
+      print("[Serial] sent: ${message.toMap()}");
+    }
   }
 
   close() {
@@ -522,23 +547,33 @@ class Serial {
     }
     Completer<Response> completer = new Completer();
     StreamSubscription<Map> subscription;
+
+    // Support when serial is done globally...
+    StreamSubscription doneSubscription =
+        _eventBus.on(_SerialDoneEvent).listen((_) {
+      if (!completer.isCompleted) {
+        completer.completeError("serial_done");
+      }
+    });
     subscription =
         _eventBus.on(_SerialDataMapEvent).listen((_SerialDataMapEvent event) {
-      Map map = event.data;
-      //devPrint("got $map");
-      Message message = Message.parseMap(map);
+      if (!completer.isCompleted) {
+        Map map = event.data;
+        //devPrint("got $map");
+        Message message = Message.parseMap(map);
 
-      if (message is Response) {
-        if (message.id == request.id) {
-          completer.complete(message);
-          subscription.cancel();
-          subscription = null;
-        }
-      } else if (message is ErrorResponse) {
-        if (message.id == request.id) {
-          completer.completeError(message.error);
-          subscription.cancel();
-          subscription = null;
+        if (message is Response) {
+          if (message.id == request.id) {
+            completer.complete(message);
+            subscription.cancel();
+            subscription = null;
+          }
+        } else if (message is ErrorResponse) {
+          if (message.id == request.id) {
+            completer.completeError(message.error);
+            subscription.cancel();
+            subscription = null;
+          }
         }
       }
     });
@@ -549,6 +584,7 @@ class Serial {
       if (subscription != null) {
         subscription.cancel();
       }
+      doneSubscription.cancel();
     }
   }
 
@@ -580,7 +616,7 @@ class Serial {
       {ConnectionOptions options}) async {
     ConnectionInfo info = await connect(path, options: options);
 
-    var serialStreamChannel = new SerialStreamChannel._(this, info);
+    var serialStreamChannel = new SerialStreamChannel._(this, path, info);
     _serialStreamChannels[info.connectionId] = serialStreamChannel;
     return serialStreamChannel;
   }

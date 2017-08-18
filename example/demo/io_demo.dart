@@ -7,7 +7,7 @@ main() async {
       new SerialWssClientService(ioWebSocketChannelFactory);
   service.start();
 
-  service.connected.listen((bool connected) async {
+  service.onConnected.listen((bool connected) async {
     if (connected) {
       print("connected");
 

@@ -61,5 +61,39 @@ main() {
         }(),
       ]);
     });
+
+    int timeScale = 50;
+    test('change_port', () async {
+      var server1 = await SerialServer.start(port: 0);
+      var server2 = await SerialServer.start(port: 0);
+
+      SerialWssClientService service =
+          new SerialWssClientService(ioWebSocketChannelFactory,
+              //retryDelay: new Duration(milliseconds: timeScale * 2),
+              url: getSerialWssUrl(port: server1.port));
+      service.start();
+      await Future.wait([
+        () async {
+          for (int i = 0; i < 50; i++) {
+            await sleep(timeScale);
+            print("connected: ${service.isConnected}");
+          }
+        }(),
+        () async {
+          await sleep(timeScale * 10);
+          expect(service.isConnected, isTrue);
+          print("closing server");
+          await server1.close();
+          print("server closed");
+          await sleep(timeScale * 10);
+          expect(service.isConnected, isFalse);
+          print("changing url");
+          service.changeUrl(getSerialWssUrl(port: server2.port));
+          await sleep(20);
+          expect(service.isConnected, isTrue);
+          await server2.close();
+        }(),
+      ]);
+    });
   });
 }

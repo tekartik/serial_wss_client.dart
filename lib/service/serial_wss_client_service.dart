@@ -13,7 +13,7 @@ class SerialWssClientService {
   Serial serial;
   final SerialClientInfo clientInfo;
   bool _shouldStop = false;
-  Duration retryDelay;
+  Duration _retryDelay;
   final WebSocketChannelFactory _factory;
   SynchronizedLock _lock = new SynchronizedLock();
   bool _isStarted = false;
@@ -24,16 +24,19 @@ class SerialWssClientService {
   bool get isConnected => serial != null;
   String _url;
 
-  final StreamController<bool> _connectedController;
-  Stream<bool> get connected => _connectedController.stream;
+  final StreamController<bool> _onConnectedController;
+  Stream<bool> get onConnected => _onConnectedController.stream;
+
+  @deprecated
+  Stream<bool> get connected => onConnected;
 
   SerialWssClientService(WebSocketChannelFactory factory,
       {String url, SerialClientInfo clientInfo, Duration retryDelay})
       : clientInfo = clientInfo,
         _factory = factory,
-        _connectedController = new StreamController.broadcast() {
+        _onConnectedController = new StreamController.broadcast() {
     _url = url ?? serialWssUrlDefault;
-    this.retryDelay = retryDelay ?? new Duration(seconds: 3);
+    this._retryDelay = retryDelay ?? new Duration(seconds: 3);
   }
 
   // must be started explicitely
@@ -53,15 +56,15 @@ class SerialWssClientService {
   }
 
   _onDisconnect() {
-    print("_onDisconnect");
+    //print("_onDisconnect");
     if (!_shouldStop) {
       serial = null;
       if (_stopCompleter != null) {
         _stopCompleter.complete();
         _stopCompleter = null;
       }
-      _connectedController.add(false);
-      sleep(retryDelay.inMilliseconds).then((_) {
+      _onConnectedController.add(false);
+      sleep(_retryDelay.inMilliseconds).then((_) {
         _tryConnect();
       });
     }
@@ -70,10 +73,11 @@ class SerialWssClientService {
   _connect() async {
     if (!isConnected) {
       await _lock.synchronized(() async {
-        WebSocketChannel wsChannel = _factory.create(_url);
-        Serial serial = new Serial(wsChannel, clientInfo: clientInfo,
-            onDataReceived: (data) {
-          /*
+        if (!isConnected) {
+          WebSocketChannel wsChannel = _factory.create(_url);
+          Serial serial = new Serial(wsChannel, clientInfo: clientInfo,
+              onDataReceived: (data) {
+            /*
       if (logJson) {
       bool _log = true;
       if (!logRecv) {
@@ -90,26 +94,30 @@ class SerialWssClientService {
       }
       }
       */
-        }, onDataSent: (data) {
-          /*
+          }, onDataSent: (data) {
+            /*
       if (logJson) {
       write('send ${data.runtimeType} ${data}');
       }
       */
-        }, onError: (error) {
-          print('connect error: $error');
-        }, onDone: _onDisconnect);
-        await serial.connected;
-        this.serial = serial;
-        _connectedController.add(true);
-        print("connected");
+          }, onError: (error) {
+            print('connect error: $error');
+          }, onDone: _onDisconnect);
+          await serial.connected;
+          this.serial = serial;
+          _onConnectedController.add(true);
+          print("connected");
+        }
       });
     }
   }
 
-  Future setUrl(String url) async {
+  Future changeUrl(String url) async {
     if (url != _url) {
+      this._url = url;
       await _stop();
+      // try connecting right away
+      await _connect();
     }
   }
 
