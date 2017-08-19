@@ -255,8 +255,8 @@ class _SerialStreamSink implements StreamSink<List<int>> {
 
   @override
   void add(List<int> data) {
-    channel._serial
-        .send(channel.connectionInfo.connectionId, new Uint8List.fromList(data));
+    channel._serial.send(
+        channel.connectionInfo.connectionId, new Uint8List.fromList(data));
   }
 
   @override

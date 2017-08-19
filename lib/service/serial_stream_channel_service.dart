@@ -1,3 +1,4 @@
+import 'package:stream_channel/stream_channel.dart';
 import 'package:tekartik_serial_wss_client/src/common_import.dart';
 import 'dart:async';
 import 'package:synchronized/synchronized.dart';
@@ -12,15 +13,15 @@ class _SerialStreamChannelServiceSink implements StreamSink<List<int>> {
 
   @override
   void add(List<int> data) {
-    if (service._channel != null) {
-      service._channel.sink.add(data);
+    if (service._currentChannel != null) {
+      service._currentChannel.sink.add(data);
     }
   }
 
   @override
   void addError(Object error, [StackTrace stackTrace]) {
-    if (service._channel != null) {
-      service._channel.sink.addError(error, stackTrace);
+    if (service._currentChannel != null) {
+      service._currentChannel.sink.addError(error, stackTrace);
     }
   }
 
@@ -42,6 +43,21 @@ class _SerialStreamChannelServiceSink implements StreamSink<List<int>> {
   }
 }
 
+class _SerialStreamChannel extends StreamChannelMixin<List<int>> {
+  final SerialStreamChannelService service;
+
+  _SerialStreamChannel(this.service);
+
+  @override
+  StreamSink<List<int>> get sink => service.sink;
+
+  @override
+  Stream<List<int>> get stream => service.stream;
+
+  @override
+  String toString() => "${service.currentChannel}";
+}
+
 class SerialStreamChannelService {
   static DevFlag debug = new DevFlag("SerialStreamChannelService debug");
 
@@ -60,17 +76,21 @@ class SerialStreamChannelService {
   bool get isStarted => _isStarted;
   bool _shouldStop = false;
 
-  // current channel if any
-  SerialStreamChannel _channel;
-  SerialStreamChannel get currentChannel => _channel;
+  // The exported channel that never closes
+  StreamChannel<List<int>> get channel => _channel;
+  _SerialStreamChannel _channel;
 
-  bool get isOpened => _channel != null;
+  // current channel if any
+  SerialStreamChannel _currentChannel;
+  SerialStreamChannel get currentChannel => _currentChannel;
+
+  bool get isOpened => _currentChannel != null;
   final SerialWssClientService _serialWssClientService;
 
   final StreamController _onOpenErrorController;
 
   // Listen to get the last error
-  Stream get onOpenError =>_onOpenErrorController.stream;
+  Stream get onOpenError => _onOpenErrorController.stream;
 
   final StreamController<bool> _onOpenedController;
 
@@ -95,6 +115,7 @@ class SerialStreamChannelService {
         _serialWssClientService = serialWssClientService {
     this._retryDelay = retryDelay ?? new Duration(seconds: 3);
     _sink = new _SerialStreamChannelServiceSink(this);
+    _channel = new _SerialStreamChannel(this);
     _serialWssClientService.onConnected.listen(_onConnected);
   }
 
@@ -119,9 +140,11 @@ class SerialStreamChannelService {
   }
 
   _onClose() {
-    //devPrint('[SerialStreamChannelService] onClose $_channel');
+    if (debug.on) {
+      print('[SerialStreamChannelService] onClose $_channel');
+    }
     // Simple setting the channel to null mark it as closed
-    _channel = null;
+    _currentChannel = null;
     _onOpenedController.add(false);
     _retryIfNeeded();
   }
@@ -162,7 +185,6 @@ class SerialStreamChannelService {
     if (_isStarted && _serialWssClientService.isConnected && !isOpened) {
       await _openCloseLock.synchronized(() async {
         if (!isOpened) {
-
           try {
             await _open();
           } catch (e) {
@@ -182,7 +204,7 @@ class SerialStreamChannelService {
           if (debug.on) {
             print('[SerialStreamChannelService] closing...');
           }
-          var channel = _channel;
+          var channel = _currentChannel;
           _onClose();
 
           try {
@@ -193,7 +215,6 @@ class SerialStreamChannelService {
           if (debug.on) {
             print('[SerialStreamChannelService] closing done');
           }
-
         }
       });
     }
@@ -204,26 +225,36 @@ class SerialStreamChannelService {
     if (!isOpened) {
       await _lock.synchronized(() async {
         if (!isOpened) {
+          SerialStreamChannel channel;
           try {
             if (debug.on) {
-              print('[SerialStreamChannelService] creating channel ($_path, $_connectionOptions)...');
+              print(
+                  '[SerialStreamChannelService] creating channel ($_path, $_connectionOptions)...');
             }
             //devPrint('[SerialStreamChannelService] creating channel...');
 
-            _channel = await _serialWssClientService.serial
+            channel = await _serialWssClientService.serial
                 .createChannel(_path, options: _connectionOptions);
-
-            if (debug.on) {
-              print(
-                  '[SerialStreamChannelService] creating channel done ${_channel}');
-            }
 
             // Add input stream
             // nothing to do for output stream
-            _streamController.addStream(_channel.stream);
+            channel.stream.listen((List<int> data) {
+              _streamController.add(data);
+            });
 
+            // notify callers
             _onOpenedController.add(true);
+
+            _currentChannel = channel;
+
+            if (debug.on) {
+              print(
+                  '[SerialStreamChannelService] creating channel done ${_currentChannel}');
+            }
           } catch (e) {
+            if (debug.on) {
+              print('[SerialStreamChannelService] creating channel error $e');
+            }
             // Try to reconnect automatically
             _retryIfNeeded();
             _onOpenErrorController.add(e);
@@ -239,6 +270,21 @@ class SerialStreamChannelService {
     await _close();
     // try connecting right away
     await _tryOpen();
+  }
 
+  Future waitForOpen(bool opened) async {
+    if (isOpened == opened) {
+      return new Future.value();
+    }
+    StreamSubscription subscription;
+    var completer = new Completer();
+    subscription = onOpened.listen((bool opened_) async {
+      devPrint('onOpened $opened_');
+      if (opened_ == opened) {
+        subscription.cancel();
+        completer.complete();
+      }
+    });
+    return completer.future;
   }
 }

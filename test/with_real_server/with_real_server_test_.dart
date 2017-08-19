@@ -74,8 +74,6 @@ main() {
               service2.stop();
               completer.complete();
             });
-
-
           }
         }
       });
@@ -90,7 +88,7 @@ main() {
       var completer = new Completer();
 
       SerialWssClientService wssService =
-      new SerialWssClientService(ioWebSocketChannelFactory);
+          new SerialWssClientService(ioWebSocketChannelFactory);
       wssService.start();
       wssService.onConnected.listen((bool connected) async {
         if (connected) {
@@ -101,11 +99,12 @@ main() {
           } else {
             String path = deviceInfos.first.path;
             SerialStreamChannelService service1 =
-            new SerialStreamChannelService(wssService, path: path);
+                new SerialStreamChannelService(wssService, path: path);
             service1.start();
 
             SerialStreamChannelService service2 =
-            new SerialStreamChannelService(wssService, path: path, retryDelay: new Duration(milliseconds: 100));
+                new SerialStreamChannelService(wssService,
+                    path: path, retryDelay: new Duration(milliseconds: 100));
             service2.start();
 
             bool wasBusy;
@@ -115,7 +114,6 @@ main() {
               } else {
                 await service2.stop();
                 completer.complete();
-
               }
             });
             service2.onOpenError.listen((swss.Error error) {
@@ -124,10 +122,7 @@ main() {
 
               // Stopping the service1 should free the port
               service1.stop();
-
             });
-
-
           }
         }
       });

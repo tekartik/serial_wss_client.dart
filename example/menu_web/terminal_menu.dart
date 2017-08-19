@@ -152,7 +152,8 @@ terminalMenu() {
 
   item('serial send data', () async {
     if (serialStreamChannel != null) {
-      write("send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId,
+      write(
+          "send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId,
           new Uint8List.fromList("hello from client".codeUnits))}");
     } else {
       write('not connected');
@@ -161,7 +162,8 @@ terminalMenu() {
 
   _send(String cmd) async {
     if (serialStreamChannel != null) {
-      write("send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId,
+      write(
+          "send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId,
           new Uint8List.fromList(cmd.codeUnits))}");
     } else {
       write('not connected');
@@ -183,8 +185,8 @@ terminalMenu() {
 
   item('serial disconnect', () async {
     if (serialStreamChannel != null) {
-      bool result =
-          await serial.disconnect(serialStreamChannel.connectionInfo.connectionId);
+      bool result = await serial
+          .disconnect(serialStreamChannel.connectionInfo.connectionId);
       write("disconnect: ${result}");
       //connectionInfo = null;
     } else {

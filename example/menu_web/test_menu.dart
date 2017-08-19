@@ -122,8 +122,8 @@ serialMenu() {
 
   item('serial disconnect', () async {
     if (serialStreamChannel != null) {
-      bool result =
-          await serial.disconnect(serialStreamChannel.connectionInfo.connectionId);
+      bool result = await serial
+          .disconnect(serialStreamChannel.connectionInfo.connectionId);
       write("disconnect: ${result}");
       //connectionInfo = null;
     } else {
@@ -134,8 +134,8 @@ serialMenu() {
   SerialStreamChannel serialStreamChannelA;
   _disconnectNullA() async {
     if (serialStreamChannelA != null) {
-      bool result =
-          await serial.disconnect(serialStreamChannelA.connectionInfo.connectionId);
+      bool result = await serial
+          .disconnect(serialStreamChannelA.connectionInfo.connectionId);
       write("disconnected: ${result}");
       serialStreamChannelA = null;
     }
@@ -174,8 +174,8 @@ serialMenu() {
   SerialStreamChannel serialStreamChannelB;
   _disconnectNullB() async {
     if (serialStreamChannelB != null) {
-      bool result =
-          await serial.disconnect(serialStreamChannelB.connectionInfo.connectionId);
+      bool result = await serial
+          .disconnect(serialStreamChannelB.connectionInfo.connectionId);
       write("disconnected: ${result}");
       serialStreamChannelB = null;
     }

@@ -38,36 +38,27 @@ main() {
 
       SerialWssClientService service = new SerialWssClientService(
           ioWebSocketChannelFactory,
-          retryDelay: new Duration(milliseconds: 300),
+          retryDelay: new Duration(milliseconds: 100),
           url: getSerialWssUrl(port: port));
       service.start();
-      await Future.wait([
-        () async {
-          for (int i = 0; i < 50; i++) {
-            await sleep(50);
-            print("connected: ${service.isConnected}");
-          }
-        }(),
-        () async {
-          await sleep(500);
-          expect(service.isConnected, isFalse);
-          server = await SerialServer.start(port: port);
-          await sleep(500);
-          expect(service.isConnected, isTrue);
-          print("closing server");
-          await server.close();
-          print("server closed");
-          await sleep(500);
-          expect(service.isConnected, isFalse);
-          server = await SerialServer.start(port: port);
-          await sleep(500);
-          expect(service.isConnected, isTrue);
-          await server.close();
-        }(),
-      ]);
+
+      await sleep(100);
+      await service.waitForConnected(false);
+
+      server = await SerialServer.start(port: port);
+      await service.waitForConnected(true);
+      expect(service.isConnected, isTrue);
+      await server.close();
+      await service.waitForConnected(false);
+      expect(service.isConnected, isFalse);
+      server = await SerialServer.start(port: port);
+      await service.waitForConnected(true);
+      expect(service.isConnected, isTrue);
+      await server.close();
+      await service.waitForConnected(false);
+      expect(service.isConnected, isFalse);
     });
 
-    int timeScale = 50;
     test('change_port', () async {
       var server1 = await SerialServer.start(port: 0);
       var server2 = await SerialServer.start(port: 0);
@@ -77,28 +68,21 @@ main() {
               //retryDelay: new Duration(milliseconds: timeScale * 2),
               url: getSerialWssUrl(port: server1.port));
       service.start();
-      await Future.wait([
-        () async {
-          for (int i = 0; i < 50; i++) {
-            await sleep(timeScale);
-            print("connected: ${service.isConnected}");
-          }
-        }(),
-        () async {
-          await sleep(timeScale * 10);
-          expect(service.isConnected, isTrue);
-          print("closing server");
-          await server1.close();
-          print("server closed");
-          await sleep(timeScale * 10);
-          expect(service.isConnected, isFalse);
-          print("changing url");
-          service.changeUrl(getSerialWssUrl(port: server2.port));
-          await sleep(20);
-          expect(service.isConnected, isTrue);
-          await server2.close();
-        }(),
-      ]);
+
+      await service.waitForConnected(true);
+      expect(service.connectedUrl, getSerialWssUrl(port: server1.port));
+      await server1.close();
+      await service.waitForConnected(false);
+      await service.changeUrl(getSerialWssUrl(port: server2.port));
+      await service.waitForConnected(true);
+      expect(service.connectedUrl, getSerialWssUrl(port: server2.port));
+      await server2.close();
+
+      server1 = await SerialServer.start(port: 0);
+      await service.changeUrl(getSerialWssUrl(port: server1.port));
+      await service.waitForConnected(true);
+      expect(service.connectedUrl, getSerialWssUrl(port: server1.port));
+      await server1.close();
     });
   });
 }

@@ -27,6 +27,8 @@ class SerialWssClientService {
 
   bool get isConnected => serial != null;
   String _url;
+  String _connectedUrl;
+  String get connectedUrl => serial == null ? null : _connectedUrl;
 
   final StreamController<bool> _onConnectedController;
   Stream<bool> get onConnected => _onConnectedController.stream;
@@ -74,7 +76,8 @@ class SerialWssClientService {
     if (!isConnected) {
       await _lock.synchronized(() async {
         if (!isConnected) {
-          WebSocketChannel wsChannel = _factory.create(_url);
+          String url = _url;
+          WebSocketChannel wsChannel = _factory.create(url);
           Serial serial = new Serial(wsChannel, clientInfo: clientInfo,
               onDataReceived: (data) {
             /*
@@ -105,6 +108,7 @@ class SerialWssClientService {
           }, onDone: _onDisconnect);
           await serial.connected;
           this._serial = serial;
+          this._connectedUrl = url;
           _onConnectedController.add(true);
           if (debug.on) {
             print("connected");
@@ -128,6 +132,7 @@ class SerialWssClientService {
       await _lock.synchronized(() async {
         if (isConnected) {
           await serial.close();
+          _serial = null;
         }
       });
     }
@@ -137,38 +142,19 @@ class SerialWssClientService {
     _shouldStop = true;
     await _stop();
   }
-/*
-serial = new Serial(channel,
-clientInfo: new SerialClientInfo()
-..name = "serial_wss_client_test_menu"
-..version = new Version(0, 1, 0), onDataReceived: (data) {
-if (logJson) {
-bool _log = true;
-if (!logRecv) {
-swss.Message message =
-swss.Message.parseMap(parseJsonObject(data));
-if (message is swss.Notification) {
-if (message.method == swss.methodReceive) {
-_log = false;
-}
-}
-}
-if (_log) {
-write('recv ${data.runtimeType} ${data}');
-}
-}
-}, onDataSent: (data) {
-if (logJson) {
-write('send ${data.runtimeType} ${data}');
-}
-}, onError: (error) {
-write('connect error: $error');
-}, onDone: () {
-write('connect done');
-serial = null;
-});
-bool connected = await serial.connected;
-write("connected $connected");
-}
-  */
+
+  Future waitForConnected(bool connected) async {
+    if (isConnected == connected) {
+      return new Future.value();
+    }
+    StreamSubscription subscription;
+    var completer = new Completer();
+    subscription = onConnected.listen((bool connected_) async {
+      if (connected_ == connected) {
+        subscription.cancel();
+        completer.complete();
+      }
+    });
+    return completer.future;
+  }
 }
