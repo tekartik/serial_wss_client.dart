@@ -7,6 +7,7 @@ import 'package:tekartik_serial_wss_sim/serial_wss_sim.dart';
 import 'dart:core' hide Error;
 import 'package:tekartik_serial_wss_client/service/io.dart';
 import 'package:tekartik_serial_wss_client/service/serial_wss_client_service.dart';
+import 'package:tekartik_serial_wss_client/src/common_import.dart';
 
 main() {
   group('client_service', () {
@@ -28,6 +29,25 @@ main() {
       });
 
       await completer.future;
+      await server.close();
+    });
+
+    test('start_stop_start', () async {
+      //SerialWssClientService.debug.on = true;
+      var server = await SerialServer.start(port: 0);
+      SerialWssClientService service = new SerialWssClientService(
+          ioWebSocketChannelFactory,
+          url: getSerialWssUrl(port: server.port));
+
+      service.start();
+      await service.waitForConnected(true);
+      await service.stop();
+      expect(service.isConnected, isFalse);
+      await service.start();
+      await service.waitForConnected(true);
+      await service.stop();
+      expect(service.isConnected, isFalse);
+
       await server.close();
     });
 

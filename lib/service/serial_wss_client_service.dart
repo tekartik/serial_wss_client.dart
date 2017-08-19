@@ -62,10 +62,12 @@ class SerialWssClientService {
   }
 
   _onDisconnect() {
-    //print("_onDisconnect");
+    if (debug.on) {
+      print('[SerialWssClientService] _onDisconnect');
+    }
+    _serial = null;
+    _onConnectedController.add(false);
     if (!_shouldStop) {
-      _serial = null;
-      _onConnectedController.add(false);
       sleep(_retryDelay.inMilliseconds).then((_) {
         _tryConnect();
       });
@@ -77,6 +79,9 @@ class SerialWssClientService {
       await _lock.synchronized(() async {
         if (!isConnected) {
           String url = _url;
+          if (debug.on) {
+            print("[SerialWssClientService] connecting $url");
+          }
           WebSocketChannel wsChannel = _factory.create(url);
           Serial serial = new Serial(wsChannel, clientInfo: clientInfo,
               onDataReceived: (data) {
@@ -104,14 +109,17 @@ class SerialWssClientService {
       }
       */
           }, onError: (error) {
-            print('connect error: $error');
+            if (debug.on) {
+              print('[SerialWssClientService] connect error: $error');
+            }
           }, onDone: _onDisconnect);
           await serial.connected;
           this._serial = serial;
           this._connectedUrl = url;
+
           _onConnectedController.add(true);
           if (debug.on) {
-            print("connected");
+            print("[SerialWssClientService] connected");
           }
         }
       });
@@ -140,6 +148,7 @@ class SerialWssClientService {
 
   Future stop() async {
     _shouldStop = true;
+    _isStarted = false;
     await _stop();
   }
 

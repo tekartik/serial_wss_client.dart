@@ -42,7 +42,7 @@ main() {
 
     test('busy_error', () async {
       //SerialStreamChannelService.debug.on = true;
-      Serial.debug.on = true;
+      //Serial.debug.on = true;
 
       var completer = new Completer();
 
@@ -83,7 +83,7 @@ main() {
 
     test('busy_then_available', () async {
       //SerialStreamChannelService.debug.on = true;
-      Serial.debug.on = true;
+      //Serial.debug.on = true;
 
       var completer = new Completer();
 

@@ -35,7 +35,7 @@ main() {
 
     test('restart_server', () async {
       //Serial.debug = true;
-      SerialStreamChannelService.debug.on = true;
+      //SerialStreamChannelService.debug.on = true;
       var server = await SerialServer.start(port: 0);
       int port = server.port;
 
@@ -65,6 +65,87 @@ main() {
       await service.waitForOpen(true);
       await server.close();
       await service.waitForOpen(false);
+    });
+
+    test('start_stop_start_service', () async {
+      //SerialWssClientService.debug.on = true;
+      //SerialStreamChannelService.debug.on = true;
+      var server = await SerialServer.start(port: 0);
+      SerialWssClientService wssService = new SerialWssClientService(
+          ioWebSocketChannelFactory,
+          url: getSerialWssUrl(port: server.port));
+      wssService.start();
+      SerialStreamChannelService service = new SerialStreamChannelService(
+          wssService,
+          path: serialWssSimMasterPortPath);
+      service.start();
+
+      await service.waitForOpen(true);
+      await service.stop();
+      await service.waitForOpen(false);
+      await service.start();
+      await service.waitForOpen(true);
+      await service.stop();
+      await service.waitForOpen(false);
+
+      await server.close();
+    });
+
+    test('start_stop_start_wss_client_service', () async {
+      //SerialWssClientService.debug.on = true;
+      //SerialStreamChannelService.debug.on = true;
+      var server = await SerialServer.start(port: 0);
+      SerialWssClientService wssService = new SerialWssClientService(
+          ioWebSocketChannelFactory,
+          url: getSerialWssUrl(port: server.port));
+      SerialStreamChannelService service = new SerialStreamChannelService(
+          wssService,
+          path: serialWssSimMasterPortPath);
+      service.start();
+
+      wssService.start();
+      await service.waitForOpen(true);
+      await wssService.stop();
+      await service.waitForOpen(false);
+      await wssService.start();
+      await service.waitForOpen(true);
+      await wssService.stop();
+      await service.waitForOpen(false);
+
+      await server.close();
+    });
+
+    test('start_stop_start_both_services', () async {
+      //SerialWssClientService.debug.on = true;
+      //SerialStreamChannelService.debug.on = true;
+      var server = await SerialServer.start(port: 0);
+      SerialWssClientService wssService = new SerialWssClientService(
+          ioWebSocketChannelFactory,
+          url: getSerialWssUrl(port: server.port));
+      wssService.start();
+      SerialStreamChannelService service = new SerialStreamChannelService(
+          wssService,
+          path: serialWssSimMasterPortPath);
+      service.start();
+
+      await service.waitForOpen(true);
+      await service.stop();
+      await wssService.stop();
+      await service.waitForOpen(false);
+      await service.start();
+      await wssService.start();
+      await service.waitForOpen(true);
+      await service.stop();
+      await wssService.stop();
+      await service.waitForOpen(false);
+      await wssService.start();
+      await service.start();
+      await service.waitForOpen(true);
+      await wssService.stop();
+      await service.stop();
+      await service.waitForOpen(false);
+
+      await server.close();
     });
 
     test('null_path', () async {

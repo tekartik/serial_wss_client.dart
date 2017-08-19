@@ -281,7 +281,6 @@ class SerialStreamChannelService {
     StreamSubscription subscription;
     var completer = new Completer();
     subscription = onOpened.listen((bool opened_) async {
-      devPrint('onOpened $opened_');
       if (opened_ == opened) {
         subscription.cancel();
         completer.complete();
