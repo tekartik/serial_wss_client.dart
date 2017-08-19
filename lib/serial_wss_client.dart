@@ -18,7 +18,7 @@ import 'package:event_bus/event_bus.dart';
 import 'package:tekartik_common_utils/hex_utils.dart';
 
 // Minimum expected server version
-Version minVersion = new Version(0, 3, 0);
+Version minVersion = new Version(0, 5, 0);
 
 const int _maxQueryId = 10000;
 const Duration requestTimeoutDuration = const Duration(milliseconds: 5000);
@@ -521,9 +521,9 @@ class Serial {
       _onDataSent(data);
     }
     _streamChannel.sink.add(data);
-    if (debug.on) {
-      print("[Serial] sent: ${message.toMap()}");
-    }
+    //if (debug.on) {
+    //  print("[Serial] sent: ${message.toMap()}");
+    //}
   }
 
   close() {

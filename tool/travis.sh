@@ -11,4 +11,4 @@ dartanalyzer --fatal-warnings \
   lib/service/io.dart \
   lib/service/serial_wss_client_service.dart \
 
-pub run test -p vm,firefox,chrome
+pub run test -p vm,firefox,chrome -j 1
