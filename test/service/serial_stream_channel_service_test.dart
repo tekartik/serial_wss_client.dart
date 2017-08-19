@@ -8,6 +8,8 @@ import 'package:tekartik_serial_wss_client/service/serial_stream_channel_service
 import 'package:tekartik_serial_wss_sim/serial_wss_sim.dart';
 import 'dart:core' hide Error;
 import 'package:tekartik_serial_wss_client/service/io.dart';
+import 'package:tekartik_serial_wss_client/message.dart' as swss;
+import 'package:tekartik_serial_wss_client/constant.dart' as swss;
 import 'package:tekartik_serial_wss_client/service/serial_wss_client_service.dart';
 
 main() {
@@ -106,19 +108,149 @@ main() {
           await sleep(300);
           expect(wssService.isConnected, isTrue);
           expect(service.isOpened, isTrue);
-          /*
-          print("closing server");
-          await server.close();
-          print("server closed");
-          await sleep(500);
-          expect(wssService.isConnected, isFalse);
-          server = await SerialServer.start(port: port);
-          await sleep(500);
-          expect(wssService.isConnected, isTrue);
-          */
+
           await server.close();
         }(),
       ]);
+    });
+
+    test('null_path', () async {
+      //Serial.debug = true;
+      var server = await SerialServer.start(port: 0);
+      int port = server.port;
+
+      SerialWssClientService wssService = new SerialWssClientService(
+          ioWebSocketChannelFactory,
+          retryDelay: new Duration(milliseconds: 100),
+          url: getSerialWssUrl(port: port));
+      wssService.start();
+
+      SerialStreamChannelService service =
+          new SerialStreamChannelService(wssService);
+      service.start();
+      await Future.wait([
+        () async {
+          for (int i = 0; i < 20; i++) {
+            await sleep(50);
+            print(
+                "connected/opened: ${wssService.isConnected}/${service.isOpened}");
+          }
+        }(),
+        () async {
+          await sleep(300);
+          expect(wssService.isConnected, isTrue);
+          expect(service.isOpened, isFalse);
+        }(),
+      ]);
+    });
+
+    test('starting_server_after', () async {
+      var server = await SerialServer.start(port: 0);
+      int port = server.port;
+      await server.close();
+
+      SerialWssClientService wssService = new SerialWssClientService(
+          ioWebSocketChannelFactory,
+          retryDelay: new Duration(milliseconds: 100),
+          url: getSerialWssUrl(port: port));
+      wssService.start();
+
+      SerialStreamChannelService service = new SerialStreamChannelService(
+          wssService,
+          path: serialWssSimMasterPortPath);
+      service.start();
+      await Future.wait([
+        () async {
+          for (int i = 0; i < 50; i++) {
+            await sleep(50);
+            print(
+                "connected/opened: ${wssService.isConnected}/${service.isOpened}");
+          }
+        }(),
+        () async {
+          await sleep(300);
+          expect(wssService.isConnected, isFalse);
+          expect(service.isOpened, isFalse);
+
+          //devPrint('[starting server]');
+          server = await SerialServer.start(port: port);
+          await sleep(300);
+          expect(wssService.isConnected, isTrue);
+          expect(service.isOpened, isTrue);
+
+          await server.close();
+        }(),
+      ]);
+    });
+
+    test('change_path', () async {
+      //SerialStreamChannelService.debug.on = true;
+      //Serial.debug.on = true;
+      var server = await SerialServer.start(port: 0);
+      int port = server.port;
+
+      SerialWssClientService wssService = new SerialWssClientService(
+          ioWebSocketChannelFactory,
+          retryDelay: new Duration(milliseconds: 100),
+          url: getSerialWssUrl(port: port));
+      wssService.start();
+
+      SerialStreamChannelService service = new SerialStreamChannelService(
+          wssService,
+          path: serialWssSimMasterPortPath);
+      service.start();
+      await Future.wait([
+        () async {
+          for (int i = 0; i < 12; i++) {
+            await sleep(50);
+            print(
+                "connected/opened: ${wssService.isConnected}/${service.isOpened}");
+          }
+        }(),
+        () async {
+          await sleep(300);
+          expect(wssService.isConnected, isTrue);
+          expect(service.isOpened, isTrue);
+          expect(service.currentChannel.path, serialWssSimMasterPortPath);
+          await service.changeConnection(serialWssSimSlavePortPath);
+          await sleep(300);
+          expect(service.isOpened, isTrue);
+          expect(service.currentChannel.path, serialWssSimSlavePortPath);
+
+          await server.close();
+        }(),
+      ]);
+    });
+
+    test('busy_error', () async {
+      //SerialStreamChannelService.debug.on = true;
+      //Serial.debug.on = true;
+      var server = await SerialServer.start(port: 0);
+      int port = server.port;
+
+      SerialWssClientService wssService = new SerialWssClientService(
+          ioWebSocketChannelFactory,
+          retryDelay: new Duration(milliseconds: 100),
+          url: getSerialWssUrl(port: port));
+      wssService.start();
+
+      SerialStreamChannelService service1 = new SerialStreamChannelService(
+          wssService,
+          path: serialWssSimMasterPortPath);
+      service1.start();
+
+      SerialStreamChannelService service2 = new SerialStreamChannelService(
+          wssService,
+          path: serialWssSimMasterPortPath);
+      service2.start();
+
+      Completer completer = new Completer();
+      service2.onOpenError.listen((swss.Error error) {
+        expect(error.code, swss.errorCodePortBusy);
+        completer.complete();
+      });
+
+      await completer.future;
     });
   });
 }

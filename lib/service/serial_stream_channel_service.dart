@@ -43,6 +43,8 @@ class _SerialStreamChannelServiceSink implements StreamSink<List<int>> {
 }
 
 class SerialStreamChannelService {
+  static DevFlag debug = new DevFlag("SerialStreamChannelService debug");
+
   // this only happens on close
   Completer _doneCompleter = new Completer();
 
@@ -50,6 +52,7 @@ class SerialStreamChannelService {
   SynchronizedLock _lock = new SynchronizedLock();
   SynchronizedLock _openCloseLock = new SynchronizedLock();
   ConnectionOptions _connectionOptions;
+
   String _path;
   Duration _retryDelay;
 
@@ -59,13 +62,19 @@ class SerialStreamChannelService {
 
   // current channel if any
   SerialStreamChannel _channel;
+  SerialStreamChannel get currentChannel => _channel;
 
   bool get isOpened => _channel != null;
   final SerialWssClientService _serialWssClientService;
 
   final StreamController _onOpenErrorController;
+
+  // Listen to get the last error
+  Stream get onOpenError =>_onOpenErrorController.stream;
+
   final StreamController<bool> _onOpenedController;
 
+  // listen to know when being opened
   Stream<bool> get onOpened => _onOpenedController.stream;
 
   StreamController<List<int>> _streamController = new StreamController();
@@ -140,7 +149,6 @@ class SerialStreamChannelService {
 
   Future _stop() async {
     if (_isStarted) {
-      _isStarted = false;
       await _lock.synchronized(() async {
         if (_isStarted) {
           _isStarted = false;
@@ -151,10 +159,10 @@ class SerialStreamChannelService {
   }
 
   _tryOpen() async {
-    if (_serialWssClientService.isConnected && !isOpened) {
+    if (_isStarted && _serialWssClientService.isConnected && !isOpened) {
       await _openCloseLock.synchronized(() async {
         if (!isOpened) {
-          //devPrint('[SerialStreamChannelService] opening...');
+
           try {
             await _open();
           } catch (e) {
@@ -171,7 +179,9 @@ class SerialStreamChannelService {
     if (isOpened) {
       await _openCloseLock.synchronized(() async {
         if (isOpened) {
-          //devPrint('[SerialStreamChannelService] closing...');
+          if (debug.on) {
+            print('[SerialStreamChannelService] closing...');
+          }
           var channel = _channel;
           _onClose();
 
@@ -180,7 +190,9 @@ class SerialStreamChannelService {
           } catch (e) {
             print(e);
           }
-          //devPrint('[SerialStreamChannelService] closing done');
+          if (debug.on) {
+            print('[SerialStreamChannelService] closing done');
+          }
 
         }
       });
@@ -193,12 +205,18 @@ class SerialStreamChannelService {
       await _lock.synchronized(() async {
         if (!isOpened) {
           try {
+            if (debug.on) {
+              print('[SerialStreamChannelService] creating channel ($_path, $_connectionOptions)...');
+            }
             //devPrint('[SerialStreamChannelService] creating channel...');
 
             _channel = await _serialWssClientService.serial
                 .createChannel(_path, options: _connectionOptions);
 
-            //devPrint('[SerialStreamChannelService] creating channel done ${_channel}');
+            if (debug.on) {
+              print(
+                  '[SerialStreamChannelService] creating channel done ${_channel}');
+            }
 
             // Add input stream
             // nothing to do for output stream
@@ -213,5 +231,14 @@ class SerialStreamChannelService {
         }
       });
     }
+  }
+
+  Future changeConnection(String path, {ConnectionOptions options}) async {
+    _path = path;
+    _connectionOptions = options;
+    await _close();
+    // try connecting right away
+    await _tryOpen();
+
   }
 }

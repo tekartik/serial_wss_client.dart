@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:synchronized/synchronized.dart';
 import 'package:tekartik_common_utils/async_utils.dart';
+import 'package:tekartik_common_utils/dev_utils.dart';
 import 'package:tekartik_serial_wss_client/constant.dart';
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -10,14 +11,17 @@ abstract class WebSocketChannelFactory {
 }
 
 class SerialWssClientService {
-  Serial serial;
+  static DevFlag debug = new DevFlag("SerialWssClientService debug");
+  // the serial service when connected
+  Serial get serial => _serial;
+
+  Serial _serial;
   final SerialClientInfo clientInfo;
   bool _shouldStop = false;
   Duration _retryDelay;
   final WebSocketChannelFactory _factory;
   SynchronizedLock _lock = new SynchronizedLock();
   bool _isStarted = false;
-  Completer _stopCompleter;
 
   bool get isStarted => _isStarted;
 
@@ -58,11 +62,7 @@ class SerialWssClientService {
   _onDisconnect() {
     //print("_onDisconnect");
     if (!_shouldStop) {
-      serial = null;
-      if (_stopCompleter != null) {
-        _stopCompleter.complete();
-        _stopCompleter = null;
-      }
+      _serial = null;
       _onConnectedController.add(false);
       sleep(_retryDelay.inMilliseconds).then((_) {
         _tryConnect();
@@ -104,9 +104,11 @@ class SerialWssClientService {
             print('connect error: $error');
           }, onDone: _onDisconnect);
           await serial.connected;
-          this.serial = serial;
+          this._serial = serial;
           _onConnectedController.add(true);
-          print("connected");
+          if (debug.on) {
+            print("connected");
+          }
         }
       });
     }
@@ -125,9 +127,7 @@ class SerialWssClientService {
     if (isConnected) {
       await _lock.synchronized(() async {
         if (isConnected) {
-          _stopCompleter = new Completer.sync();
           await serial.close();
-          await _stopCompleter.future;
         }
       });
     }

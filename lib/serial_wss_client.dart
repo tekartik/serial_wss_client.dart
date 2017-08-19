@@ -256,7 +256,7 @@ class _SerialStreamSink implements StreamSink<List<int>> {
   @override
   void add(List<int> data) {
     channel._serial
-        .send(channel.info.connectionId, new Uint8List.fromList(data));
+        .send(channel.connectionInfo.connectionId, new Uint8List.fromList(data));
   }
 
   @override
@@ -285,7 +285,7 @@ class _SerialStreamSink implements StreamSink<List<int>> {
   @override
   Future close() async {
     try {
-      await channel._serial.disconnect(channel.info.connectionId);
+      await channel._serial.disconnect(channel.connectionInfo.connectionId);
     } catch (e) {
       print("close error: $e");
     }
@@ -298,12 +298,12 @@ class _SerialStreamSink implements StreamSink<List<int>> {
 class SerialStreamChannel extends StreamChannelMixin<List<int>> {
   final Serial _serial;
   final String path;
-  final ConnectionInfo info;
+  final ConnectionInfo connectionInfo;
   StreamController<List<int>> _streamController = new StreamController();
 
   _SerialStreamSink _sink;
 
-  SerialStreamChannel._(this._serial, this.path, this.info) {
+  SerialStreamChannel._(this._serial, this.path, this.connectionInfo) {
     _sink = new _SerialStreamSink(this);
   }
 
@@ -322,17 +322,14 @@ class SerialStreamChannel extends StreamChannelMixin<List<int>> {
     _sink._close();
   }
 
-  int get connectionId => info.connectionId;
+  int get connectionId => connectionInfo.connectionId;
 
   @override
-  String toString() => "$path $info";
+  String toString() => "$path $connectionInfo";
 }
 
 class Serial {
-  static bool _debug = false;
-  static bool get debug => _debug;
-  @deprecated
-  static set debug(bool debug) => _debug = debug;
+  static DevFlag debug = new DevFlag("Serial debug");
 
   StreamChannel _streamChannel;
   bool _done = false;
@@ -429,7 +426,7 @@ class Serial {
     });
 
     _streamChannel.stream.listen((data) {
-      if (debug) {
+      if (debug.on) {
         print("[Serial] recv($data)");
       }
       //devPrint("recv: $data");
@@ -449,7 +446,7 @@ class Serial {
         _eventBus.fire(new _SerialDataMapEvent(map));
       }
     }, onError: (error) {
-      if (debug) {
+      if (debug.on) {
         print("[Serial] onError($error)");
       }
       //devError(error);
@@ -460,7 +457,7 @@ class Serial {
         _connectedCompleter.completeError(error);
       }
     }, onDone: () {
-      if (debug) {
+      if (debug.on) {
         print("[Serial] onDone");
       }
       _eventBus.fire(new _SerialDoneEvent());
@@ -516,7 +513,7 @@ class Serial {
   Future<bool> get connected => _connectedCompleter.future;
 
   sendMessage(Message message) {
-    if (debug) {
+    if (debug.on) {
       print("[Serial] send: ${message.toMap()}");
     }
     String data = JSON.encode(message.toMap());
@@ -524,7 +521,7 @@ class Serial {
       _onDataSent(data);
     }
     _streamChannel.sink.add(data);
-    if (debug) {
+    if (debug.on) {
       print("[Serial] sent: ${message.toMap()}");
     }
   }

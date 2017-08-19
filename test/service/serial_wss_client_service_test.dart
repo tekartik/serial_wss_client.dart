@@ -10,21 +10,26 @@ import 'package:tekartik_serial_wss_client/service/serial_wss_client_service.dar
 
 main() {
   group('client_service', () {
-    /*
-    test('depends', () async {
+    test('start_stop', () async {
+      var server = await SerialServer.start(port: 0);
       SerialWssClientService service = new SerialWssClientService(
           ioWebSocketChannelFactory,
-          retryDelay: new Duration(milliseconds: 300));
+          url: getSerialWssUrl(port: server.port));
+      var completer = new Completer();
+
       service.start();
-      for (int i = 0; i < 100; i++) {
-        await sleep(100);
-        print("connected: ${service.isConnected}");
-      }
-      await service.stop();
-      print("connected: ${service.isConnected}");
-      await sleep(2000);
+      service.onConnected.listen((bool connected) async {
+        if (connected) {
+          expect(service.isConnected, isTrue);
+
+          await service.stop();
+          completer.complete();
+        }
+      });
+
+      await completer.future;
+      await server.close();
     });
-    */
 
     test('service', () async {
       var server = await SerialServer.start(port: 0);
