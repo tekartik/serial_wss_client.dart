@@ -97,7 +97,9 @@ class SerialStreamChannelService {
   // listen to know when being opened
   Stream<bool> get onOpened => _onOpenedController.stream;
 
+  // exposed to send test data
   StreamController<List<int>> _streamController = new StreamController();
+  StreamController<List<int>> get streamController => _streamController;
 
   // The stream to listen to
   Stream<List<int>> get stream => _streamController.stream;
