@@ -165,6 +165,8 @@ class ConnectionOptions {
     }
     return map;
   }
+
+  toString() => toMap().toString();
 }
 
 // ConnectionInfo
