@@ -69,7 +69,17 @@ class SerialStreamChannelService {
   SynchronizedLock _openCloseLock = new SynchronizedLock();
   ConnectionOptions _connectionOptions;
 
+  // upon setup
+  ConnectionOptions get connectionOptions => _connectionOptions;
+
+  // Filled when connected
+  ConnectionInfo get connectionInfo => currentChannel?.connectionInfo;
+
   String _path;
+
+  // upon setup
+  String get path => _path;
+
   Duration _retryDelay;
 
   bool _isStarted = false;

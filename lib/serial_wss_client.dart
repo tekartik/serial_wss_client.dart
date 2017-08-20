@@ -14,6 +14,7 @@ import 'package:tekartik_common_utils/version_utils.dart';
 import 'package:tekartik_serial_wss_client/message.dart';
 import 'package:func/func.dart';
 import 'package:tekartik_common_utils/json_utils.dart';
+import 'package:tekartik_common_utils/bool_utils.dart';
 import 'package:event_bus/event_bus.dart';
 import 'package:tekartik_common_utils/hex_utils.dart';
 
@@ -69,13 +70,6 @@ class DeviceInfo {
 }
 
 // "dataBits":"eight","name":"","parityBit":"no","paused":false,"persistent":false,"receiveTimeout":0,"sendTimeout":0,"stopBits":"one"}
-const String dataBitsEight = "eight";
-const String stopBitsOne = "one";
-const String parityBitNone = "no";
-
-const int bitRate38400 = 38400;
-const int bitRate115200 = 115200;
-const int bitRate9600 = 9600;
 
 // ConnectionOptions
 /*
@@ -110,6 +104,9 @@ integer	(optional) sendTimeout
 The maximum amount of time (in milliseconds) to wait for a send operation to complete before calling the callback with a "timeout" error. If zero, send timeout errors will not be triggered. Defaults to 0.
  */
 class ConnectionOptions {
+  bool persistent;
+  String name;
+  int bufferSize;
   int bitrate;
   String dataBits;
   String parityBit;
@@ -119,13 +116,52 @@ class ConnectionOptions {
   int sendTimeout;
 
   fromMap(Map map) {
-    bitrate = map["bitrate"];
+    if (map != null) {
+      persistent = parseBool(map["persistent"]);
+      name = map["name"]?.toString();
+      bufferSize = parseInt(map["bufferSize"]);
+      bitrate = parseInt(map["bitrate"]);
+      dataBits = map["dataBits"]?.toString();
+      parityBit = map["parityBit"];
+      stopBits = map["stopBits"]?.toString();
+      dataBits = map["dataBits"]?.toString();
+      ctsFlowControl = parseBool(map["ctsFlowControl"]);
+      receiveTimeout = parseInt(map["receiveTimeout"]);
+      sendTimeout = parseInt(map["sendTimeout"]);
+    }
   }
 
   Map toMap() {
     Map map = {};
+    if (name != null) {
+      map['name'] = name;
+    }
+    if (persistent != null) {
+      map['persistent'] = persistent;
+    }
+    if (bufferSize != null) {
+      map['bufferSize'] = bufferSize;
+    }
     if (bitrate != null) {
       map['bitrate'] = bitrate;
+    }
+    if (dataBits != null) {
+      map['dataBits'] = dataBits;
+    }
+    if (parityBit != null) {
+      map['parityBit'] = parityBit;
+    }
+    if (bitrate != null) {
+      map['stopBits'] = stopBits;
+    }
+    if (ctsFlowControl != null) {
+      map['ctsFlowControl'] = ctsFlowControl;
+    }
+    if (receiveTimeout != null) {
+      map['receiveTimeout'] = receiveTimeout;
+    }
+    if (sendTimeout != null) {
+      map['sendTimeout'] = sendTimeout;
     }
     return map;
   }
@@ -174,13 +210,14 @@ class ConnectionInfo extends ConnectionOptions {
 
   fromMap(Map map) {
     super.fromMap(map);
-    connectionId = map["connectionId"];
-    bitrate = map["bitrate"];
+    connectionId = parseInt(map["connectionId"]);
   }
 
   Map toMap() {
     Map map = super.toMap();
-    map["connectionId"] = connectionId;
+    if (connectionId != null) {
+      map["connectionId"] = connectionId;
+    }
     return map;
   }
 

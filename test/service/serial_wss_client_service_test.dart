@@ -136,7 +136,6 @@ main() {
 
       Completer completer = new Completer();
       wssService.onConnectError.listen((error) {
-        devPrint('error: $error');
         if (!completer.isCompleted) {
           completer.complete();
         }

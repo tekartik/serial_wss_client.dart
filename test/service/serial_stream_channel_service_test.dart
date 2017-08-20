@@ -26,9 +26,15 @@ main() {
       SerialStreamChannelService service = new SerialStreamChannelService(
           wssService,
           path: serialWssSimMasterPortPath);
+      expect(service.connectionOptions, isNull);
+      expect(service.connectionInfo, isNull);
+      expect(service.path, serialWssSimMasterPortPath);
       service.start();
 
       await service.waitForOpen(true);
+      expect(service.connectionOptions, isNull);
+      expect(service.connectionInfo.connectionId, isNotNull);
+      expect(service.path, serialWssSimMasterPortPath);
       await server.close();
       await service.waitForOpen(false);
     });
