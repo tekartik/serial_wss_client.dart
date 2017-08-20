@@ -11,12 +11,28 @@ import 'package:tekartik_serial_wss_client/src/common_import.dart';
 
 main() {
   group('client_service', () {
+    test('default', () async {
+      SerialWssClientService service =
+          new SerialWssClientService(ioWebSocketChannelFactory);
+      expect(service.url, getSerialWssUrl());
+      await service.changeUrl(null);
+      expect(service.url, getSerialWssUrl());
+    });
+
+    test('invalid_url', () async {
+      SerialWssClientService service =
+          new SerialWssClientService(ioWebSocketChannelFactory, url: "dummy");
+      await service.start();
+      await service.changeUrl("another dummy");
+      await service.stop();
+    });
     test('start_stop', () async {
       var server = await SerialServer.start(port: 0);
       SerialWssClientService service = new SerialWssClientService(
           ioWebSocketChannelFactory,
           url: getSerialWssUrl(port: server.port));
       var completer = new Completer();
+      expect(service.url, getSerialWssUrl(port: server.port));
 
       service.start();
       service.onConnected.listen((bool connected) async {
@@ -103,6 +119,31 @@ main() {
       await service.waitForConnected(true);
       expect(service.connectedUrl, getSerialWssUrl(port: server1.port));
       await server1.close();
+    });
+
+    test('on_connect_error', () async {
+      //SerialStreamChannelService.debug.on = true;
+      //Serial.debug.on = true;
+      var server = await SerialServer.start(port: 0);
+      int port = server.port;
+      await server.close();
+
+      SerialWssClientService wssService = new SerialWssClientService(
+          ioWebSocketChannelFactory,
+          retryDelay: new Duration(milliseconds: 100),
+          url: getSerialWssUrl(port: port));
+      wssService.start();
+
+      Completer completer = new Completer();
+      wssService.onConnectError.listen((error) {
+        devPrint('error: $error');
+        if (!completer.isCompleted) {
+          completer.complete();
+        }
+      });
+
+      await completer.future;
+      await wssService.stop();
     });
   });
 }
