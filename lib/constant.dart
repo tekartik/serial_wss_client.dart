@@ -1,11 +1,12 @@
 const int serialWssPortDefault = 8988;
 
+const String _localhost = "127.0.0.1";
 String getSerialWssUrl({int port}) {
   port ??= serialWssPortDefault;
-  return "ws://localhost:${port}";
+  return "ws://${_localhost}:${port}";
 }
 
-const String serialWssUrlDefault = "ws://localhost:${serialWssPortDefault}";
+const String serialWssUrlDefault = "ws://${_localhost}:${serialWssPortDefault}";
 
 const String serialWssSimMasterPortPath = "_master";
 const String serialWssSimSlavePortPath = "_slave";

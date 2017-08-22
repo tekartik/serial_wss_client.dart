@@ -23,7 +23,7 @@ dev_dependencies:
     version: '>=0.3.1'
   tekartik_serial_wss_sim:
     git: git://github.com/tekartik/serial_wss_sim.dart
-    version: '>0.2.0'
+    version: '>=0.2.0'
   chrome_travis:
     git: git://github.com/tekartik/chrome_travis.dart
 
