@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'package:async/src/stream_sink_transformer.dart';
-import 'package:stream_channel/src/stream_channel_transformer.dart';
+
 import 'package:stream_channel/stream_channel.dart';
-import 'package:tekartik_common_utils/dev_utils.dart';
 import 'package:tekartik_common_utils/int_utils.dart';
 import 'package:tekartik_serial_wss_client/channel/client/memory.dart';
 import 'package:tekartik_serial_wss_client/channel/client/web_socket_channel.dart';
 import 'package:tekartik_serial_wss_client/channel/server/web_socket_channel_server.dart';
 import 'package:tekartik_serial_wss_client/channel/web_socket_channel.dart';
-import 'package:web_socket_channel/web_socket_channel.dart' as native;
 
 class MemoryWebSocket {
   int _lastPortId = 0;
@@ -17,12 +14,12 @@ class MemoryWebSocket {
 
   addServer(WebSocketChannelServer server) {
     servers[server.port] = server;
-    devPrint("adding $server");
+    // devPrint("adding $server");
   }
 
   removeServer(WebSocketChannelServer server) {
     servers.remove(server.port);
-    devPrint("removing $server");
+    // devPrint("removing $server");
   }
 
   int checkPort(int port) {
@@ -34,10 +31,10 @@ class MemoryWebSocket {
     }
     return port;
   }
-
 }
 
 final MemoryWebSocket memoryWebSocket = new MemoryWebSocket();
+
 /*
 class MemoryServer {
   List<WebSocketChannelServer> servers;
@@ -71,9 +68,11 @@ class MemorySink implements StreamSink {
   final MemoryWebSocketChannel channel;
 
   MemorySink(this.channel);
+
   MemoryWebSocketChannel get link => channel.link;
 
   Completer doneCompleter = new Completer();
+
   @override
   void add(event) {
     if (link != null) {
@@ -96,16 +95,25 @@ class MemorySink implements StreamSink {
     return new Future.value();
   }
 
+  Future _close() async {
+    if (!doneCompleter.isCompleted) {
+      doneCompleter.complete();
+    }
+  }
+
+  // close the channel instead
+  // it will call _close
   @override
-  Future close() {
-    doneCompleter.complete();
+  Future close() async {
+    channel.close();
   }
 
   @override
   Future get done => doneCompleter.future;
 }
-class MemoryWebSocketClientChannelFactory extends WebSocketClientChannelFactory {
 
+class MemoryWebSocketClientChannelFactory
+    extends WebSocketClientChannelFactory {
   @override
   WebSocketChannel connect(String url) {
     return new MemoryWebSocketClientChannel.connect(url);
@@ -113,57 +121,97 @@ class MemoryWebSocketClientChannelFactory extends WebSocketClientChannelFactory 
 }
 
 class MemoryWebSocketServerChannel extends MemoryWebSocketChannel {
+  final MemoryWebSocketChannelServer channelServer;
+
   // associated client
   MemoryWebSocketClientChannel client;
+
+  MemoryWebSocketServerChannel(this.channelServer) {
+    channelServer.channels.add(this);
+  }
+
   MemoryWebSocketChannel get link => client;
-}
-class MemoryWebSocketClientChannel extends MemoryWebSocketChannel {
-  MemoryWebSocketServerChannel server;
-  MemoryWebSocketChannel get link => server;
-  String url;
-  MemoryWebSocketClientChannel.connect(this.url) {
 
-    int port = parseInt(url.replaceFirst(webSocketUrlMemoryScheme + ":" ,""));
-    devPrint("port $port");
-
-
-    // Find server
-    MemoryWebSocketChannelServer channelServer = memoryWebSocket.servers[port];
-    if (channelServer != null) {
-      // connect them
-      MemoryWebSocketServerChannel serverChannel = new MemoryWebSocketServerChannel()..client = this;
-      this.server = serverChannel;
-
-      // notify
-      channelServer.streamController.add(serverChannel);
-    } else {
-      throw "cannot connect ${this.url}";
-    }
+  _close() {
+    channelServer.channels.remove(this);
   }
 }
-abstract class MemoryWebSocketChannel extends StreamChannelMixin implements WebSocketChannel   {
+
+class MemoryWebSocketClientChannel extends MemoryWebSocketChannel {
+  MemoryWebSocketServerChannel server;
+
+  MemoryWebSocketChannel get link => server;
+  String url;
+
+  MemoryWebSocketClientChannel.connect(this.url) {
+    if (!url.startsWith(webSocketUrlMemoryScheme)) {
+      throw "unsupported scheme";
+    }
+    int port = parseInt(url.replaceFirst(webSocketUrlMemoryScheme + ":", ""));
+
+    // Deley others
+    new Future.value().then((_) {
+      // devPrint("port $port");
+
+      // Find server
+      MemoryWebSocketChannelServer channelServer =
+          memoryWebSocket.servers[port];
+      if (channelServer != null) {
+        // connect them
+        MemoryWebSocketServerChannel serverChannel =
+            new MemoryWebSocketServerChannel(channelServer)..client = this;
+        this.server = serverChannel;
+
+        // notify
+        channelServer.streamController.add(serverChannel);
+      } else {
+        streamController.addError("cannot connect ${this.url}");
+        close();
+        //throw "cannot connect ${this.url}";
+      }
+    });
+  }
+}
+
+abstract class MemoryWebSocketChannel extends StreamChannelMixin
+    implements WebSocketChannel {
   int id;
 
   StreamController streamController;
   String url;
 
   MemoryWebSocketChannel get link;
+
   MemoryWebSocketChannel() {
     streamController = new StreamController();
     sink = new MemorySink(this);
   }
 
   @override
-  StreamSink sink;
+  MemorySink sink;
 
   @override
   Stream get stream => streamController.stream;
+
+  bool _closing = false;
+
+  Future close() async {
+    if (!_closing) {
+      _closing = true;
+      await sink._close();
+      await streamController.close();
+      // link might be null if not connected yet
+      await link?.close();
+    }
+  }
 }
 
-class MergedWebSocketChannelClientFactory extends WebSocketClientChannelFactory {
+class MergedWebSocketChannelClientFactory
+    extends WebSocketClientChannelFactory {
   WebSocketClientChannelFactory defaultFactory;
 
   MergedWebSocketChannelClientFactory(this.defaultFactory);
+
   @override
   WebSocketChannel connect(String url) {
     if (url.startsWith("memory:")) {
@@ -173,29 +221,34 @@ class MergedWebSocketChannelClientFactory extends WebSocketClientChannelFactory 
   }
 }
 
-
 class MemoryWebSocketChannelServer implements WebSocketChannelServer {
-
+  List<WebSocketChannel> channels = [];
   StreamController<MemoryWebSocketServerChannel> streamController;
+
   Stream<WebSocketChannel> get stream => streamController.stream;
 
   final int port;
+
   MemoryWebSocketChannelServer(this.port) {
     streamController = new StreamController();
-
   }
 
   close() async {
-    streamController.close();
+    // Close our stream
+    await streamController.close();
 
     // remove from our table
     memoryWebSocket.removeServer(this);
 
+    // kill all connections
+    List<MemoryWebSocketChannel> channels = new List.from(this.channels);
+    for (MemoryWebSocketChannel channel in channels) {
+      await channel.close();
+    }
   }
 
   @override
   String get url => "${webSocketUrlMemoryScheme}:${port}";
 
   toString() => "server $url";
-
 }
