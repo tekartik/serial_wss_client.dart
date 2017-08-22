@@ -1,17 +1,15 @@
-@TestOn("vm")
+import 'dart:async';
+import 'dart:core' hide Error;
 
+import 'package:dev_test/test.dart';
+import 'package:tekartik_serial_wss_client/channel/client/io.dart';
+import 'package:tekartik_serial_wss_client/constant.dart' as swss;
+import 'package:tekartik_serial_wss_client/message.dart' as swss;
+@TestOn("vm")
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 import 'package:tekartik_serial_wss_client/service/serial_stream_channel_service.dart';
-
-import 'package:tekartik_serial_wss_client/message.dart' as swss;
-import 'package:tekartik_serial_wss_client/constant.dart' as swss;
-
-import 'package:tekartik_serial_wss_client/src/common_import.dart';
-import 'dart:async';
-import 'package:dev_test/test.dart';
-import 'dart:core' hide Error;
-import 'package:tekartik_serial_wss_client/service/io.dart';
 import 'package:tekartik_serial_wss_client/service/serial_wss_client_service.dart';
+import 'package:tekartik_serial_wss_client/src/common_import.dart';
 
 // Need real server running
 main() {
@@ -21,7 +19,7 @@ main() {
 
       var completer = new Completer();
       SerialWssClientService wssService =
-          new SerialWssClientService(ioWebSocketChannelFactory);
+          new SerialWssClientService(ioWebSocketClientChannelFactory);
       wssService.start();
       wssService.onConnected.listen((bool connected) async {
         if (connected) {
@@ -47,7 +45,7 @@ main() {
       var completer = new Completer();
 
       SerialWssClientService wssService =
-          new SerialWssClientService(ioWebSocketChannelFactory);
+          new SerialWssClientService(ioWebSocketClientChannelFactory);
       wssService.start();
       wssService.onConnected.listen((bool connected) async {
         if (connected) {
@@ -88,7 +86,7 @@ main() {
       var completer = new Completer();
 
       SerialWssClientService wssService =
-          new SerialWssClientService(ioWebSocketChannelFactory);
+          new SerialWssClientService(ioWebSocketClientChannelFactory);
       wssService.start();
       wssService.onConnected.listen((bool connected) async {
         if (connected) {

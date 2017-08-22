@@ -2,14 +2,11 @@ import 'dart:async';
 import 'package:synchronized/synchronized.dart';
 import 'package:tekartik_common_utils/async_utils.dart';
 import 'package:tekartik_common_utils/dev_utils.dart';
+import 'package:tekartik_serial_wss_client/channel/client/web_socket_channel.dart';
+import 'package:tekartik_serial_wss_client/channel/web_socket_channel.dart';
 import 'package:tekartik_serial_wss_client/constant.dart';
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:tekartik_common_utils/string_utils.dart';
-
-abstract class WebSocketChannelFactory {
-  WebSocketChannel create(String url);
-}
 
 class SerialWssClientService {
   static DevFlag debug = new DevFlag("SerialWssClientService debug");
@@ -20,7 +17,7 @@ class SerialWssClientService {
   final SerialClientInfo clientInfo;
   bool _shouldStop = false;
   Duration _retryDelay;
-  final WebSocketChannelFactory _factory;
+  final WebSocketClientChannelFactory _factory;
   SynchronizedLock _lock = new SynchronizedLock();
   bool _isStarted = false;
 
@@ -43,7 +40,7 @@ class SerialWssClientService {
   // Listen to get the last error
   Stream get onConnectError => _onConnectErrorController.stream;
 
-  SerialWssClientService(WebSocketChannelFactory factory,
+  SerialWssClientService(WebSocketClientChannelFactory factory,
       {String url, SerialClientInfo clientInfo, Duration retryDelay})
       : clientInfo = clientInfo,
         _factory = factory,
@@ -96,7 +93,7 @@ class SerialWssClientService {
 
           WebSocketChannel wsChannel;
           try {
-            wsChannel = _factory.create(url);
+            wsChannel = _factory.connect(url);
           } catch (e) {
             _onConnectErrorController.add(e);
             rethrow;

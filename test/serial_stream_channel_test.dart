@@ -1,12 +1,17 @@
-@TestOn("vm")
-import 'package:dev_test/test.dart';
-import 'package:tekartik_serial_wss_client/constant.dart';
-import 'package:tekartik_serial_wss_sim/serial_wss_sim.dart';
 import 'dart:core' hide Error;
-import 'package:tekartik_serial_wss_client/service/io.dart';
-import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 
-main() {
+import 'package:dev_test/test.dart';
+import 'package:tekartik_serial_wss_client/channel/memory.dart';
+import 'package:tekartik_serial_wss_client/channel/web_socket_channel.dart';
+import 'package:tekartik_serial_wss_client/constant.dart';
+import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
+import 'package:tekartik_serial_wss_sim/serial_wss_sim.dart';
+
+void main() {
+  test_main(memoryWebSocketChannelFactory);
+}
+
+void test_main(WebSocketChannelFactory channelFactory) {
   group('serial_stream_channel', () {
     /*
     test('depends', () async {
@@ -25,13 +30,14 @@ main() {
     */
 
     test('open_close', () async {
-      var server = await SerialServer.start(port: 0);
+      var server = await SerialServer.start(channelFactory.server, port: 0);
       Serial serial = new Serial(
-          ioWebSocketChannelFactory.create(getSerialWssUrl(port: server.port)));
+          channelFactory.client.connect(
+              getSerialWssUrl(port: server.port)));
       await serial.connected;
 
       SerialStreamChannel channel =
-          await serial.createChannel(serialWssSimMasterPortPath);
+      await serial.createChannel(serialWssSimMasterPortPath);
       await channel.close();
 
       await server.close();
@@ -40,13 +46,15 @@ main() {
     test('open_kill_server_close', () async {
       //SerialServer.debug = true;
       //Serial.debug = true;
-      var server = await SerialServer.start(port: 0);
+      var server = await SerialServer.start(channelFactory.server,
+          port: 0);
       Serial serial = new Serial(
-          ioWebSocketChannelFactory.create(getSerialWssUrl(port: server.port)));
+          channelFactory.client.connect(
+              getSerialWssUrl(port: server.port)));
       await serial.connected;
 
       SerialStreamChannel channel =
-          await serial.createChannel(serialWssSimMasterPortPath);
+      await serial.createChannel(serialWssSimMasterPortPath);
       await server.close();
 
       await channel.close();
