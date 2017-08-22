@@ -215,7 +215,7 @@ class MergedWebSocketChannelClientFactory
   @override
   WebSocketChannel connect(String url) {
     if (url.startsWith("memory:")) {
-      return new MemoryWebSocketClientChannel.connect(url);
+      return memoryWebSocketClientChannelFactory.connect(url);
     }
     return defaultFactory.connect(url);
   }

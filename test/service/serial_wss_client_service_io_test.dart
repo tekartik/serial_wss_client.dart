@@ -4,7 +4,9 @@ import 'dart:core' hide Error;
 
 import 'package:dev_test/test.dart';
 import 'package:tekartik_serial_wss_client/channel/client/io.dart';
+import 'package:tekartik_serial_wss_client/channel/client/memory.dart';
 import 'package:tekartik_serial_wss_client/channel/io.dart';
+import 'package:tekartik_serial_wss_client/channel/memory.dart';
 import 'package:tekartik_serial_wss_client/constant.dart';
 import 'package:tekartik_serial_wss_client/service/serial_wss_client_service.dart';
 import 'package:tekartik_serial_wss_client/src/common_import.dart';
@@ -56,6 +58,32 @@ main() {
 
       await completer.future;
       await server.close();
+    });
+
+    test('change_scheme', () async {
+      var server1 = await SerialServer.start(ioWebSocketChannelFactory.server, port: 0);
+      var server2 = await SerialServer.start(memoryWebSocketChannelFactory.server, port: 0);
+
+      var clientChannelFactory = smartWebSocketChannelClientFactory(ioWebSocketChannelFactory.client);
+      SerialWssClientService service =
+      new SerialWssClientService(clientChannelFactory,
+          url: server1.url);
+      service.start();
+
+      await service.waitForConnected(true);
+      expect(service.connectedUrl, server1.url);
+      await server1.close();
+      await service.waitForConnected(false);
+      await service.changeUrl(server2.url);
+      await service.waitForConnected(true);
+      expect(service.connectedUrl, server2.url);
+      await server2.close();
+
+      server1 = await SerialServer.start(ioWebSocketChannelFactory.server, port: 0);
+      await service.changeUrl(server1.url);
+      await service.waitForConnected(true);
+      expect(service.connectedUrl, server1.url);
+      await server1.close();
     });
   });
 }

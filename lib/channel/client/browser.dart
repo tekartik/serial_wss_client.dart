@@ -3,7 +3,7 @@ import 'package:tekartik_serial_wss_client/channel/native.dart';
 import 'package:tekartik_serial_wss_client/channel/web_socket_channel.dart';
 import 'package:web_socket_channel/html.dart';
 
-class BrowserWebSocketChannelClientFactory
+class BrowserWebSocketClientChannelFactory
     extends WebSocketClientChannelFactory {
   @override
   WebSocketChannel connect(String url) {
@@ -11,6 +11,6 @@ class BrowserWebSocketChannelClientFactory
   }
 }
 
-final BrowserWebSocketChannelClientFactory
-    browserWebSocketChannelClientFactory =
-    new BrowserWebSocketChannelClientFactory();
+final BrowserWebSocketClientChannelFactory
+    browserWebSocketClientChannelFactory =
+    new BrowserWebSocketClientChannelFactory();
