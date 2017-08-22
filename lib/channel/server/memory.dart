@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io' hide sleep;
 
 import 'package:tekartik_serial_wss_client/channel/server/web_socket_channel_server.dart';
 import 'package:tekartik_serial_wss_client/channel/src/memory/memory_web_socket_channel.dart';
@@ -8,7 +7,8 @@ class _MemoryWebSocketChannelServerFactory
     implements WebSocketChannelServerFactory {
   Future<WebSocketChannelServer> serve({address, int port}) async {
     port ??= 0;
-    address ??= InternetAddress.ANY_IP_V6;
+    // We don't care about the address
+    //address ??= InternetAddress.ANY_IP_V6;
 
     port = memoryWebSocket.checkPort(port);
 

@@ -277,6 +277,9 @@ class SerialStreamChannelService {
   }
 
   Future changeConnection(String path, {ConnectionOptions options}) async {
+    if (debug.on) {
+      print('[SerialStreamChannelService] changing connection to $path $options');
+    }
     _path = path;
     _connectionOptions = options;
     await _close();

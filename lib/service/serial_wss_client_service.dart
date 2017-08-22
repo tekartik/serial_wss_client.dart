@@ -145,6 +145,9 @@ class SerialWssClientService {
 
   Future changeUrl(String url) async {
     if (url != _url) {
+      if (debug.on) {
+        print("[SerialWssClientService] changing to $url");
+      }
       this._url = url;
       await _stop();
       // try connecting right away
