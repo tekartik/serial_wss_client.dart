@@ -289,9 +289,25 @@ test_main(WebSocketChannelFactory channelFactory) {
 
       Completer masterReceiveCompleter = new Completer();
       Completer slaveReceiveCompleter = new Completer();
+      Completer masterAnotherStreamReceiveCompleter = new Completer();
+      Completer masterSinkStreamReceiveCompleter = new Completer();
+
+      slave.channel.sink.add([5, 6, 7, 8]);
+
+      // make sure we can listen multiple times to the stream
+      master.stream.listen((List<int> data) {
+        expect(data, [5, 6, 7, 8]);
+        print(data);
+        masterAnotherStreamReceiveCompleter.complete();
+      });
+      // this does not work if data was added before...
+      master.sinkStream.listen((List<int> data) {
+        expect(data, [1, 2, 3, 4]);
+        print(data);
+        masterSinkStreamReceiveCompleter.complete();
+      });
 
       master.channel.sink.add([1, 2, 3, 4]);
-      slave.channel.sink.add([5, 6, 7, 8]);
 
       master.channel.stream.listen((List<int> data) {
         expect(data, [5, 6, 7, 8]);
@@ -305,8 +321,12 @@ test_main(WebSocketChannelFactory channelFactory) {
         slaveReceiveCompleter.complete();
       });
 
-      await masterReceiveCompleter.future;
-      await slaveReceiveCompleter.future;
+      await Future.wait([
+        masterAnotherStreamReceiveCompleter.future,
+        masterSinkStreamReceiveCompleter.future,
+        masterReceiveCompleter.future,
+        slaveReceiveCompleter.future
+      ]);
       //await service.stop();
       await server.close();
     });

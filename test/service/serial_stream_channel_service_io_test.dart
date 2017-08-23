@@ -10,5 +10,4 @@ import 'serial_wss_client_service_test.dart';
 
 main() {
   test_main(ioWebSocketChannelFactory);
-
 }

@@ -15,6 +15,8 @@ class _SerialStreamChannelServiceSink implements StreamSink<List<int>> {
   void add(List<int> data) {
     if (service._currentChannel != null) {
       service._currentChannel.sink.add(data);
+      // stream (for history)
+      service._sinkStreamController.add(data);
     }
   }
 
@@ -108,10 +110,15 @@ class SerialStreamChannelService {
   Stream<bool> get onOpened => _onOpenedController.stream;
 
   // exposed to send test data
-  StreamController<List<int>> _streamController = new StreamController();
-  StreamController<List<int>> get streamController => _streamController;
+  StreamController<List<int>> _streamController;
+  //StreamController<List<int>> get streamController => _streamController;
+
+  // exposed to get sent data (for history)
+  StreamController<List<int>> _sinkStreamController;
+  Stream<List<int>> get sinkStream => _sinkStreamController.stream;
 
   // The stream to listen to
+  // it can have multiple listener
   Stream<List<int>> get stream => _streamController.stream;
 
   // The sink to post to
@@ -122,8 +129,10 @@ class SerialStreamChannelService {
       {ConnectionOptions connectionOptions, String path, Duration retryDelay})
       : _connectionOptions = connectionOptions,
         _path = path,
+        _streamController = new StreamController.broadcast(),
         _onOpenedController = new StreamController.broadcast(),
         _onOpenErrorController = new StreamController.broadcast(),
+        _sinkStreamController = new StreamController.broadcast(),
         _serialWssClientService = serialWssClientService {
     this._retryDelay = retryDelay ?? new Duration(seconds: 3);
     _sink = new _SerialStreamChannelServiceSink(this);
@@ -278,7 +287,8 @@ class SerialStreamChannelService {
 
   Future changeConnection(String path, {ConnectionOptions options}) async {
     if (debug.on) {
-      print('[SerialStreamChannelService] changing connection to $path $options');
+      print(
+          '[SerialStreamChannelService] changing connection to $path $options');
     }
     _path = path;
     _connectionOptions = options;

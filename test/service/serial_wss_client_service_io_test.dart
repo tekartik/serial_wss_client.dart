@@ -61,13 +61,15 @@ main() {
     });
 
     test('change_scheme', () async {
-      var server1 = await SerialServer.start(ioWebSocketChannelFactory.server, port: 0);
-      var server2 = await SerialServer.start(memoryWebSocketChannelFactory.server, port: 0);
+      var server1 =
+          await SerialServer.start(ioWebSocketChannelFactory.server, port: 0);
+      var server2 = await SerialServer
+          .start(memoryWebSocketChannelFactory.server, port: 0);
 
-      var clientChannelFactory = smartWebSocketChannelClientFactory(ioWebSocketChannelFactory.client);
+      var clientChannelFactory =
+          smartWebSocketChannelClientFactory(ioWebSocketChannelFactory.client);
       SerialWssClientService service =
-      new SerialWssClientService(clientChannelFactory,
-          url: server1.url);
+          new SerialWssClientService(clientChannelFactory, url: server1.url);
       service.start();
 
       await service.waitForConnected(true);
@@ -79,7 +81,8 @@ main() {
       expect(service.connectedUrl, server2.url);
       await server2.close();
 
-      server1 = await SerialServer.start(ioWebSocketChannelFactory.server, port: 0);
+      server1 =
+          await SerialServer.start(ioWebSocketChannelFactory.server, port: 0);
       await service.changeUrl(server1.url);
       await service.waitForConnected(true);
       expect(service.connectedUrl, server1.url);
