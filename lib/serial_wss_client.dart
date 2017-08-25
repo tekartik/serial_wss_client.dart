@@ -575,12 +575,14 @@ class Serial {
     }
   }
 
+  Map<int, Request> connectionIdPendingSendRequests = {};
   Future<Response> _sendRequest(Request request) async {
     if (!_connected) {
       if (request.method != methodInit) {
         throw "client not connected";
       }
     }
+
     Completer<Response> completer = new Completer();
     StreamSubscription<Map> subscription;
 
@@ -704,8 +706,8 @@ class Serial {
     // send String {"jsonrpc":"2.0","id":5,"method":"send","params":{"connectionId":4,"data":"68656C6C6F2066726F6D20636C69656E74"}}
     // recv String {"jsonrpc":"2.0","id":5,"result":{"bytesSent":17,"error":"pending"}}
     // recv String {"jsonrpc":"2.0","id":5,"result":{"bytesSent":0,"error":"pending"}}
-    Map params = {"connectionId": connectionId, "data": toHexString(data)};
-    Request request = new Request(_nextRequestId, methodSend, params);
+    //Map params = {"connectionId": connectionId, "data": toHexString(data)};
+    Request request = new DataSendRequest(_nextRequestId, connectionId, data);
     Response response = await _sendRequest(request);
 
     SendInfo info = new SendInfo()..fromMap(response.result);

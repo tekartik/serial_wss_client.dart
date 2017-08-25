@@ -1,3 +1,5 @@
+import 'package:tekartik_common_utils/hex_utils.dart';
+
 const methodInit = 'init'; // request optional params are name (client name)
 
 const methodGetDevices = 'getDevices'; // request
@@ -105,6 +107,20 @@ class Request extends _MessageWithId with _RequestMixin {
     _updateMap(map);
     return map;
   }
+}
+
+class DataRequest extends Request {
+  int connectionId;
+  List<int> data;
+  DataRequest(id, String method, this.connectionId, this.data)
+      : super(id, method) {
+    _params = {"connectionId": connectionId, "data": toHexString(data)};
+  }
+}
+
+class DataSendRequest extends DataRequest {
+  DataSendRequest(id, int connectionId, List<int> data)
+      : super(id, methodSend, connectionId, data);
 }
 
 class Response extends _MessageWithId {
