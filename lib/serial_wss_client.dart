@@ -151,7 +151,7 @@ class ConnectionOptions {
     if (parityBit != null) {
       map['parityBit'] = parityBit;
     }
-    if (bitrate != null) {
+    if (stopBits != null) {
       map['stopBits'] = stopBits;
     }
     if (ctsFlowControl != null) {
@@ -553,7 +553,7 @@ class Serial {
 
   sendMessage(Message message) {
     if (debug.on) {
-      print("[Serial] send: ${message.toMap()}");
+      print("[Serial] send: ${JSON.encode(message.toMap())}");
     }
     String data = JSON.encode(message.toMap());
     if (_onDataSent != null) {
