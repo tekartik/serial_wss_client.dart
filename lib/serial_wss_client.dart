@@ -627,8 +627,8 @@ class Serial {
   }
 
   Future<bool> _init(SerialClientInfo clientInfo) async {
-    // --> {"jsonrpc":"2.0","id":2,"method":"connect","params":{"path":"/dev/ttyUSB0"}}",
-    // <-- {"jsonrpc":"2.0","id":20,"result":{"connectionId":7}}
+    // --> {"jsonrpc": "2.0","id": 1,"method": "init"}
+    // <-- {"jsonrpc": "2.0","id": 1,"result": true}
     Request request =
         new Request(_nextRequestId, methodInit, clientInfo?.toMap());
     Response response = await _sendRequest(request);
