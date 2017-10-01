@@ -1,10 +1,16 @@
 library test_menu;
 
 import 'dart:typed_data';
+
+import 'package:tekartik_serial_wss_client/channel/client/browser.dart';
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
+import 'package:tekartik_test_menu/src/common_import.dart';
 import 'package:tekartik_test_menu/test_menu_mdl_browser.dart';
 import 'package:web_socket_channel/html.dart';
+
 import 'terminal_menu.dart';
+import 'wss_client_service_menu.dart';
+import 'wss_stream_channel_service_menu.dart';
 
 serverMenu() {
   item('connect', () {
@@ -204,29 +210,13 @@ serialMenu() {
 
 main() async {
   await initTestMenuBrowser(); //js: ['test_menu.js']);
+  menu('serial', serialMenu);
+  menu('terminal', terminalMenu);
+  menu('wss client service', () {
+    wssClientServiceMenu(browserWebSocketClientChannelFactory);
+  });
 
-  menu('main', () {
-    item("write hola", () async {
-      write('Hola');
-      //write('RESULT prompt: ${await prompt()}');
-    });
-    item("prompt", () async {
-      write('RESULT prompt: ${await prompt('Some text please then [ENTER]')}');
-    });
-    item("js console.log", () {
-      js_test('testConsoleLog');
-    });
-    item("print hi", () {
-      print('hi');
-    });
-    item("crash", () {
-      throw "Hi";
-    });
-    menu('sub', () {
-      item("print hi", () => print('hi'));
-    });
-
-    menu('serial', serialMenu);
-    menu('terminal', terminalMenu);
+  menu('wss stream channel service', () {
+    wssStreamChannelServiceMenu(browserWebSocketClientChannelFactory);
   });
 }

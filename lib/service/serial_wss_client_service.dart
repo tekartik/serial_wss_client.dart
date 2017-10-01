@@ -36,6 +36,8 @@ class SerialWssClientService {
   Stream<bool> get connected => onConnected;
 
   final StreamController _onConnectErrorController;
+  // receive error
+  //final StreamController _onErrorController;
 
   // Listen to get the last error
   Stream get onConnectError => _onConnectErrorController.stream;
@@ -45,7 +47,9 @@ class SerialWssClientService {
       : clientInfo = clientInfo,
         _factory = factory,
         _onConnectErrorController = new StreamController.broadcast(),
-        _onConnectedController = new StreamController.broadcast() {
+        _onConnectedController = new StreamController.broadcast()
+  //_onErrorController = new StreamController.broadcast()
+  {
     _url = url;
     this._retryDelay = retryDelay ?? new Duration(seconds: 3);
   }

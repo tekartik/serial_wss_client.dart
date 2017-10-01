@@ -9,6 +9,8 @@ const methodSend = 'send'; // request
 const methodFlush = 'flush'; // request
 
 const methodReceive = 'recv'; // notification
+const methodError = 'error'; // notification
+const methodDisconnected = 'disconnected'; // notification
 
 const methodInfo = 'info'; // from server upon connection, notification
 

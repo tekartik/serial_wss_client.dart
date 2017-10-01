@@ -160,6 +160,8 @@ class SerialStreamChannelService {
     }
   }
 
+  // to call to close the current potentially connection
+  // and retry later
   _onClose() {
     if (debug.on) {
       print('[SerialStreamChannelService] onClose $_channel');
@@ -246,6 +248,14 @@ class SerialStreamChannelService {
     if (!isOpened) {
       await _lock.synchronized(() async {
         if (!isOpened) {
+          // ignore null _path
+          if (_path == null) {
+            if (debug.on) {
+              print('[SerialStreamChannelService] path not set');
+              _retryIfNeeded();
+            }
+            return;
+          }
           SerialStreamChannel channel;
           try {
             if (debug.on) {
@@ -261,6 +271,21 @@ class SerialStreamChannelService {
             // nothing to do for output stream
             channel.stream.listen((List<int> data) {
               _streamController.add(data);
+            },
+                // Handle error
+                onError: (error) {
+              if (debug.on) {
+                print('[SerialStreamChannelService] error $error');
+              }
+              _streamController.addError(error);
+            }, onDone: () {
+              if (debug.on) {
+                print('[SerialStreamChannelService] done');
+              }
+              // Close the channel
+              channel.close();
+              // mark as closed for retry
+              _onClose();
             });
 
             // notify callers

@@ -36,3 +36,5 @@ const int bitRate2400 = 2400;
 const int bitRate1200 = 1200;
 const int bitRate300 = 300;
 const int bitRate110 = 110;
+
+const String serialWssPackagePrefix = 'com.tekartik.serial_wss';

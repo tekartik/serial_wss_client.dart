@@ -1,5 +1,9 @@
 # Changelog
 
-## 0.0.1
+## 0.6.0
 
-- Initial version, created by Stagehand
+Version for server 0.6.0 that handles disconnect
+
+## 0.5.0
+
+First version for server 0.5.0

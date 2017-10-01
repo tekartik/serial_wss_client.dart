@@ -11,6 +11,7 @@ import 'dart:typed_data';
 import 'package:stream_channel/stream_channel.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:tekartik_common_utils/version_utils.dart';
+import 'package:tekartik_serial_wss_client/constant.dart';
 import 'package:tekartik_serial_wss_client/message.dart';
 import 'package:func/func.dart';
 import 'package:tekartik_common_utils/json_utils.dart';
@@ -19,6 +20,7 @@ import 'package:event_bus/event_bus.dart';
 import 'package:tekartik_common_utils/hex_utils.dart';
 
 // Minimum expected server version
+// Best is however 0.6.0 at this point
 Version minVersion = new Version(0, 5, 0);
 
 const int _maxQueryId = 10000;
@@ -430,11 +432,11 @@ class Serial {
         try {
           Message message = Message.parseMap(map);
           if (message is Notification) {
-            if (message.method == "info") {
+            if (message.method == methodInfo) {
               Map info = message.params;
               var package = info["package"];
               if (package is String) {
-                if (package.startsWith('com.tekartik.serial_wss')) {
+                if (package.startsWith(serialWssPackagePrefix)) {
                   String versionText = info["version"];
                   if (versionText is String) {
                     serverVersion = parseVersion(versionText);
@@ -541,7 +543,25 @@ class Serial {
               print('data ${data.runtimeType} not supported');
             }
           } else {
-            print('nobody to listen to data');
+            print('nobody to listen to received data');
+          }
+        } else if (message.method == methodError) {
+          int connectionId = message.params['connectionId'];
+          var _serialStreamChannel = _serialStreamChannels[connectionId];
+          if (_serialStreamChannel != null) {
+            var error = message.params['error'];
+            _serialStreamChannel._streamController.addError(error);
+          } else {
+            print('nobody to listen to error');
+          }
+        } else if (message.method == methodDisconnected) {
+          int connectionId = message.params['connectionId'];
+          var _serialStreamChannel = _serialStreamChannels[connectionId];
+          if (_serialStreamChannel != null) {
+            _serialStreamChannel._close();
+            _serialStreamChannels[connectionId] = null;
+          } else {
+            print('nobody to listen to disconnect');
           }
         }
       }

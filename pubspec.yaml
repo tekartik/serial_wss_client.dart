@@ -1,6 +1,6 @@
 name: tekartik_serial_wss_client
 description: A starting point for Dart libraries or applications.
-version: 0.4.1
+version: 0.6.0
 #homepage: https://www.example.com
 #author: alex <email@example.com>
 
@@ -20,7 +20,7 @@ dev_dependencies:
   dev_test: any
   tekartik_test_menu:
     git: git://github.com/tekartik/test_menu.dart
-    version: '>=0.3.1'
+    version: '>=0.4.5'
   tekartik_serial_wss_sim:
     git: git://github.com/tekartik/serial_wss_sim.dart
     version: '>=0.2.0'
