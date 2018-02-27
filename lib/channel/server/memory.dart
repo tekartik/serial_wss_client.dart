@@ -50,7 +50,7 @@ class _MemoryWebSocketChannelServerFactory
   }
 }
 
-bool _debug = true;
+// bool _debug = true;
 
 WebSocketChannelServerFactory memoryWebSocketChannelServerFactory =
     new _MemoryWebSocketChannelServerFactory();

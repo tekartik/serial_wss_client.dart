@@ -1,5 +1,6 @@
 import 'package:stream_channel/stream_channel.dart';
 import 'package:tekartik_serial_wss_client/src/common_import.dart';
+import 'package:tekartik_serial_wss_client/message.dart' as swss;
 import 'dart:async';
 import 'package:synchronized/synchronized.dart';
 import 'package:tekartik_common_utils/async_utils.dart';
@@ -99,10 +100,10 @@ class SerialStreamChannelService {
   bool get isOpened => _currentChannel != null;
   final SerialWssClientService _serialWssClientService;
 
-  final StreamController _onOpenErrorController;
+  final StreamController<swss.Error> _onOpenErrorController;
 
   // Listen to get the last error
-  Stream get onOpenError => _onOpenErrorController.stream;
+  Stream<swss.Error> get onOpenError => _onOpenErrorController.stream;
 
   final StreamController<bool> _onOpenedController;
 

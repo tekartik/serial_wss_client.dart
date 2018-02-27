@@ -17,8 +17,8 @@ channel_test_main(WebSocketChannelFactory channelFactory) {
   group("channel", () {
     group("simple", () {
       WebSocketChannelServer server;
-      WebSocketChannel wsClient;
-      WebSocketChannel wsServer;
+      WebSocketChannel<List<int>> wsClient;
+      WebSocketChannel<List<int>> wsServer;
 
       Future simpleTest(Function close) async {
         server = await channelFactory.server.serve();
