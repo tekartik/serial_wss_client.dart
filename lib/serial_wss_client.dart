@@ -423,7 +423,7 @@ class Serial {
 
     _infoSubscription = _eventBus.on(_SerialDataMapEvent)
         // ignore: strong_mode_uses_dynamic_as_bottom
-        .listen((_SerialDataMapEvent event) async {
+        .listen((event) async {
       Map map = event.data;
 
       //devPrint(map);
@@ -526,7 +526,7 @@ class Serial {
   _startReceiveSubscription() {
     _receiveSubscription =
         // ignore: strong_mode_uses_dynamic_as_bottom
-        _eventBus.on(_SerialDataMapEvent).listen((_SerialDataMapEvent event) {
+        _eventBus.on(_SerialDataMapEvent).listen((event) {
       Map map = event.data;
       //devPrint("recv data $map");
       Message message = Message.parseMap(map);
@@ -616,7 +616,7 @@ class Serial {
     });
     subscription =
         // ignore: strong_mode_uses_dynamic_as_bottom
-        _eventBus.on(_SerialDataMapEvent).listen((_SerialDataMapEvent event) {
+        _eventBus.on(_SerialDataMapEvent).listen((event) {
       if (!completer.isCompleted) {
         Map map = event.data;
         //devPrint("got $map");

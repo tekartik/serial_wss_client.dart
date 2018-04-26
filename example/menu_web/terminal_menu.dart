@@ -32,7 +32,7 @@ terminalMenu() {
             bool _log = true;
             if (!logRecv) {
               swss.Message message =
-                  swss.Message.parseMap(parseJsonObject(data));
+                  swss.Message.parseMap(parseJsonObject(data as String));
               if (message is swss.Notification) {
                 if (message.method == swss.methodReceive) {
                   _log = false;
