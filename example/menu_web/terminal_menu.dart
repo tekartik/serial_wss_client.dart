@@ -6,7 +6,7 @@ import 'package:tekartik_serial_wss_client/message.dart' as swss;
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 import 'package:tekartik_test_menu/test_menu_mdl_browser.dart';
 import 'package:web_socket_channel/html.dart';
-import 'dart:convert';
+//import 'package:dart2_constant/convert.dart';
 
 terminalMenu() {
   Serial serial;
