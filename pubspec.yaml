@@ -12,7 +12,9 @@ dependencies:
   event_bus: any
   web_socket_channel: any
   tekartik_common_utils:
-    git: git://github.com/tekartik/common_utils.dart
+    git:
+      url: git://github.com/tekartik/common_utils.dart
+      ref: dart1
     version: '>=0.4.9'
   dart2_constant: any
 
@@ -20,13 +22,19 @@ dev_dependencies:
   test: any
   dev_test: any
   tekartik_test_menu:
-    git: git://github.com/tekartik/test_menu.dart
+    git:
+      url: git://github.com/tekartik/test_menu.dart
+      ref: dart1
     version: '>=0.4.5'
   tekartik_serial_wss_sim:
-    git: git://github.com/tekartik/serial_wss_sim.dart
+    git:
+      url: git://github.com/tekartik/serial_wss_sim.dart
+      ref: dart1
     version: '>=0.2.0'
   chrome_travis:
-    git: git://github.com/tekartik/chrome_travis.dart
+    git:
+      url: git://github.com/tekartik/chrome_travis.dart
+      ref: dart1
 
 dependency_overrides:
 #  tekartik_serial_wss_sim:
