@@ -5,7 +5,7 @@ version: 0.6.1
 #author: alex <email@example.com>
 
 environment:
-  sdk: '>=1.20.1 <2.0.0'
+  sdk: '>=2.0.0-dev.58 <3.0.0'
 
 dependencies:
   func: any
@@ -14,27 +14,28 @@ dependencies:
   tekartik_common_utils:
     git:
       url: git://github.com/tekartik/common_utils.dart
-      ref: dart1
+      ref: dart2
     version: '>=0.4.9'
   dart2_constant: any
 
 dev_dependencies:
   test: any
   dev_test: any
-  tekartik_test_menu:
+  tekartik_test_menu_browser:
     git:
       url: git://github.com/tekartik/test_menu.dart
-      ref: dart1
+      ref: dart2
+      path: test_menu_browser
     version: '>=0.4.5'
   tekartik_serial_wss_sim:
     git:
       url: git://github.com/tekartik/serial_wss_sim.dart
-      ref: dart1
+      ref: dart2
     version: '>=0.2.0'
   chrome_travis:
     git:
       url: git://github.com/tekartik/chrome_travis.dart
-      ref: dart1
+      ref: dart2
 
 dependency_overrides:
 #  tekartik_serial_wss_sim:
