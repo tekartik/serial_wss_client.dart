@@ -1,6 +1,6 @@
 name: tekartik_serial_wss_client
 description: A starting point for Dart libraries or applications.
-version: 0.6.1
+version: 0.7.0-dev.1
 #homepage: https://www.example.com
 #author: alex <email@example.com>
 
@@ -8,7 +8,6 @@ environment:
   sdk: '>=2.0.0-dev.58 <3.0.0'
 
 dependencies:
-  func: any
   event_bus: any
   web_socket_channel: any
   tekartik_common_utils:
@@ -27,11 +26,17 @@ dev_dependencies:
       ref: dart2
       path: test_menu_browser
     version: '>=0.4.5'
+  tekartik_test_menu_io:
+    git:
+      url: git://github.com/tekartik/test_menu.dart
+      ref: dart2
+      path: test_menu_io
+    version: '>=0.4.5'
   tekartik_serial_wss_sim:
     git:
       url: git://github.com/tekartik/serial_wss_sim.dart
       ref: dart2
-    version: '>=0.2.0'
+    version: '>=0.3.0-dev.1'
   chrome_travis:
     git:
       url: git://github.com/tekartik/chrome_travis.dart
