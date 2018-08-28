@@ -12,7 +12,7 @@ class _IoWebSocketChannelServerFactory
     implements WebSocketChannelServerFactory {
   Future<WebSocketChannelServer> serve({address, int port}) async {
     port ??= 0;
-    address ??= InternetAddress.ANY_IP_V6;
+    address ??= InternetAddress.anyIPv6;
     _IoWebSocketChannelServer server =
         new _IoWebSocketChannelServer(address, port);
     await server.serve();

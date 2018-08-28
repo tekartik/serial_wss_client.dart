@@ -63,8 +63,9 @@ main() {
     test('change_scheme', () async {
       var server1 =
           await SerialServer.start(ioWebSocketChannelFactory.server, port: 0);
-      var server2 = await SerialServer
-          .start(memoryWebSocketChannelFactory.server, port: 0);
+      var server2 = await SerialServer.start(
+          memoryWebSocketChannelFactory.server,
+          port: 0);
 
       var clientChannelFactory =
           smartWebSocketChannelClientFactory(ioWebSocketChannelFactory.client);

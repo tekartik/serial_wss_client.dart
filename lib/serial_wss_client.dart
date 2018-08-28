@@ -13,7 +13,6 @@ import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:tekartik_common_utils/version_utils.dart';
 import 'package:tekartik_serial_wss_client/constant.dart';
 import 'package:tekartik_serial_wss_client/message.dart';
-import 'package:func/func.dart';
 import 'package:tekartik_common_utils/json_utils.dart';
 import 'package:tekartik_common_utils/bool_utils.dart';
 import 'package:event_bus/event_bus.dart';
@@ -400,8 +399,8 @@ class Serial {
 
   Map<int, SerialStreamChannel> _serialStreamChannels = {};
 
-  Func1 _onDataReceived;
-  Func1 _onDataSent;
+  Function _onDataReceived;
+  Function _onDataSent;
 
   Version serverVersion;
 
@@ -421,7 +420,7 @@ class Serial {
     _onDataReceived = onDataReceived;
     _onDataSent = onDataSent;
 
-    _infoSubscription = _eventBus.on(_SerialDataMapEvent)
+    _infoSubscription = _eventBus.on<_SerialDataMapEvent>()
         // ignore: strong_mode_uses_dynamic_as_bottom
         .listen((event) async {
       Map map = event.data;
@@ -526,7 +525,7 @@ class Serial {
   _startReceiveSubscription() {
     _receiveSubscription =
         // ignore: strong_mode_uses_dynamic_as_bottom
-        _eventBus.on(_SerialDataMapEvent).listen((event) {
+        _eventBus.on<_SerialDataMapEvent>().listen((event) {
       Map map = event.data;
       //devPrint("recv data $map");
       Message message = Message.parseMap(map);
@@ -574,9 +573,9 @@ class Serial {
 
   sendMessage(Message message) {
     if (debug.on) {
-      print("[Serial] send: ${JSON.encode(message.toMap())}");
+      print("[Serial] send: ${json.encode(message.toMap())}");
     }
-    String data = JSON.encode(message.toMap());
+    String data = json.encode(message.toMap());
     if (_onDataSent != null) {
       _onDataSent(data);
     }
@@ -605,18 +604,18 @@ class Serial {
     }
 
     Completer<Response> completer = new Completer();
-    StreamSubscription<Map> subscription;
+    StreamSubscription<_SerialDataMapEvent> subscription;
 
     // Support when serial is done globally...
     StreamSubscription doneSubscription =
-        _eventBus.on(_SerialDoneEvent).listen((_) {
+        _eventBus.on<_SerialDoneEvent>().listen((_) {
       if (!completer.isCompleted) {
         completer.completeError("serial_done");
       }
     });
     subscription =
         // ignore: strong_mode_uses_dynamic_as_bottom
-        _eventBus.on(_SerialDataMapEvent).listen((event) {
+        _eventBus.on<_SerialDataMapEvent>().listen((event) {
       if (!completer.isCompleted) {
         Map map = event.data;
         //devPrint("got $map");

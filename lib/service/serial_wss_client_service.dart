@@ -18,14 +18,14 @@ class SerialWssClientService {
   bool _shouldStop = false;
   Duration _retryDelay;
   final WebSocketClientChannelFactory _factory;
-  SynchronizedLock _lock = new SynchronizedLock();
+  Lock _lock = Lock();
   bool _isStarted = false;
 
   bool get isStarted => _isStarted;
 
   bool get isConnected => serial != null;
   String _url;
-  String get url => nonEmpty(_url) ?? serialWssUrlDefault;
+  String get url => stringNonEmpty(_url) ?? serialWssUrlDefault;
   String _connectedUrl;
   String get connectedUrl => serial == null ? null : _connectedUrl;
 

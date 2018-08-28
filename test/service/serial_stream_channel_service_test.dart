@@ -76,8 +76,8 @@ test_main(WebSocketChannelFactory channelFactory) {
       () async {
         for (int i = 0; i < 20; i++) {
           await sleep(50);
-          print("connected/opened: ${wssService.isConnected}/${service
-                  .isOpened}");
+          print(
+              "connected/opened: ${wssService.isConnected}/${service.isOpened}");
         }
       }();
 

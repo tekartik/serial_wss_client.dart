@@ -68,8 +68,8 @@ class SerialStreamChannelService {
   Completer _doneCompleter = new Completer();
 
   Future get done => _doneCompleter.future;
-  SynchronizedLock _lock = new SynchronizedLock();
-  SynchronizedLock _openCloseLock = new SynchronizedLock();
+  Lock _lock = Lock();
+  Lock _openCloseLock = Lock();
   ConnectionOptions _connectionOptions;
 
   // upon setup
