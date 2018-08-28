@@ -304,7 +304,7 @@ class SerialStreamChannelService {
             }
             // Try to reconnect automatically
             _retryIfNeeded();
-            _onOpenErrorController.add(e);
+            _onOpenErrorController.add(e as swss.Error);
           }
         }
       });

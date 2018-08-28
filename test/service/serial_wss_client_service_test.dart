@@ -3,8 +3,7 @@ import 'dart:core' hide Error;
 
 import 'package:dev_test/test.dart';
 import 'package:tekartik_common_utils/async_utils.dart';
-import 'package:tekartik_serial_wss_client/channel/memory.dart';
-import 'package:tekartik_serial_wss_client/channel/web_socket_channel.dart';
+import 'package:tekartik_web_socket/web_socket.dart';
 import 'package:tekartik_serial_wss_client/constant.dart';
 import 'package:tekartik_serial_wss_client/service/serial_wss_client_service.dart';
 import 'package:tekartik_serial_wss_client/src/common_import.dart';
@@ -14,13 +13,13 @@ main() {
   group('client_service_memory', () {
     test('default', () async {
       SerialWssClientService service =
-          new SerialWssClientService(memoryWebSocketChannelFactory.client);
+          new SerialWssClientService(webSocketChannelClientFactoryMemory);
       expect(service.url, getSerialWssUrl());
       await service.changeUrl(null);
       expect(service.url, getSerialWssUrl());
     });
   });
-  test_main(memoryWebSocketChannelFactory);
+  test_main(webSocketChannelFactoryMemory);
 }
 
 test_main(WebSocketChannelFactory channelFactory) {

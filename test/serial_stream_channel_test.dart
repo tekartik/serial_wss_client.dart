@@ -1,14 +1,13 @@
 import 'dart:core' hide Error;
 
 import 'package:dev_test/test.dart';
-import 'package:tekartik_serial_wss_client/channel/memory.dart';
-import 'package:tekartik_serial_wss_client/channel/web_socket_channel.dart';
+import 'package:tekartik_web_socket/web_socket.dart';
 import 'package:tekartik_serial_wss_client/constant.dart';
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 import 'package:tekartik_serial_wss_sim/serial_wss_sim.dart';
 
 void main() {
-  test_main(memoryWebSocketChannelFactory);
+  test_main(webSocketChannelFactoryMemory);
 }
 
 void test_main(WebSocketChannelFactory channelFactory) {

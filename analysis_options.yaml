@@ -1,6 +1,6 @@
 analyzer:
   strong-mode:
-    implicit-casts: true
+    implicit-casts: false
 #   exclude:
 #     - path/to/excluded/files/**
 

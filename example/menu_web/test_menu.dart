@@ -2,7 +2,7 @@ library test_menu;
 
 import 'dart:typed_data';
 
-import 'package:tekartik_serial_wss_client/channel/client/browser.dart';
+import 'package:tekartik_web_socket_browser/web_socket_browser.dart';
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 //import 'package:tekartik_test_menu/src/common_import.dart';
 import 'package:tekartik_test_menu_browser/test_menu_mdl_browser.dart';
@@ -213,10 +213,10 @@ main() async {
   menu('serial', serialMenu);
   menu('terminal', terminalMenu);
   menu('wss client service', () {
-    wssClientServiceMenu(browserWebSocketClientChannelFactory);
+    wssClientServiceMenu(webSocketClientChannelFactoryBrowser);
   });
 
   menu('wss stream channel service', () {
-    wssStreamChannelServiceMenu(browserWebSocketClientChannelFactory);
+    wssStreamChannelServiceMenu(webSocketClientChannelFactoryBrowser);
   });
 }

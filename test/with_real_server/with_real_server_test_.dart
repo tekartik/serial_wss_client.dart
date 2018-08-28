@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:core' hide Error;
 
 import 'package:dev_test/test.dart';
-import 'package:tekartik_serial_wss_client/channel/client/io.dart';
+import 'package:tekartik_web_socket_io/web_socket_io.dart';
 import 'package:tekartik_serial_wss_client/constant.dart' as swss;
 import 'package:tekartik_serial_wss_client/message.dart' as swss;
 @TestOn("vm")
@@ -19,7 +19,7 @@ main() {
 
       var completer = new Completer();
       SerialWssClientService wssService =
-          new SerialWssClientService(ioWebSocketClientChannelFactory);
+          new SerialWssClientService(webSocketChannelClientFactoryIo);
       wssService.start();
       wssService.onConnected.listen((bool connected) async {
         if (connected) {
@@ -45,7 +45,7 @@ main() {
       var completer = new Completer();
 
       SerialWssClientService wssService =
-          new SerialWssClientService(ioWebSocketClientChannelFactory);
+          new SerialWssClientService(webSocketChannelClientFactoryIo);
       wssService.start();
       wssService.onConnected.listen((bool connected) async {
         if (connected) {
@@ -86,7 +86,7 @@ main() {
       var completer = new Completer();
 
       SerialWssClientService wssService =
-          new SerialWssClientService(ioWebSocketClientChannelFactory);
+          new SerialWssClientService(webSocketChannelClientFactoryIo);
       wssService.start();
       wssService.onConnected.listen((bool connected) async {
         if (connected) {

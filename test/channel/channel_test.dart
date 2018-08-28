@@ -2,21 +2,19 @@ import 'dart:async';
 
 import 'package:dev_test/test.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
-import 'package:tekartik_serial_wss_client/channel/memory.dart';
-import 'package:tekartik_serial_wss_client/channel/server/web_socket_channel_server.dart';
-import 'package:tekartik_serial_wss_client/channel/web_socket_channel.dart';
+import 'package:tekartik_web_socket/web_socket.dart';
 //import 'package:func/func.dart';
 
 //import 'package:tekartik_serial_wss_client/channel/channel.dart';
 
 main() {
-  channel_test_main(memoryWebSocketChannelFactory);
+  channel_test_main(webSocketChannelFactoryMemory);
 }
 
 channel_test_main(WebSocketChannelFactory channelFactory) {
   group("channel", () {
     group("simple", () {
-      WebSocketChannelServer server;
+      WebSocketChannelServer<List<int>> server;
       WebSocketChannel<List<int>> wsClient;
       WebSocketChannel<List<int>> wsServer;
 

@@ -2,8 +2,7 @@ import 'dart:async';
 import 'package:synchronized/synchronized.dart';
 import 'package:tekartik_common_utils/async_utils.dart';
 import 'package:tekartik_common_utils/dev_utils.dart';
-import 'package:tekartik_serial_wss_client/channel/client/web_socket_channel.dart';
-import 'package:tekartik_serial_wss_client/channel/web_socket_channel.dart';
+import 'package:tekartik_web_socket/web_socket.dart';
 import 'package:tekartik_serial_wss_client/constant.dart';
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 import 'package:tekartik_common_utils/string_utils.dart';
@@ -17,7 +16,7 @@ class SerialWssClientService {
   final SerialClientInfo clientInfo;
   bool _shouldStop = false;
   Duration _retryDelay;
-  final WebSocketClientChannelFactory _factory;
+  final WebSocketChannelClientFactory _factory;
   Lock _lock = Lock();
   bool _isStarted = false;
 
@@ -42,7 +41,7 @@ class SerialWssClientService {
   // Listen to get the last error
   Stream get onConnectError => _onConnectErrorController.stream;
 
-  SerialWssClientService(WebSocketClientChannelFactory factory,
+  SerialWssClientService(WebSocketChannelClientFactory factory,
       {String url, SerialClientInfo clientInfo, Duration retryDelay})
       : clientInfo = clientInfo,
         _factory = factory,

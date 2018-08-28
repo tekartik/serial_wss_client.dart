@@ -41,10 +41,10 @@ class DeviceInfo {
   String displayName;
 
   fromMap(Map map) {
-    path = map["path"];
-    vendorId = map["vendorId"];
-    productId = map["productId"];
-    displayName = map["displayName"];
+    path = map["path"] as String;
+    vendorId = map["vendorId"] as int;
+    productId = map["productId"] as int;
+    displayName = map["displayName"] as String;
   }
 
   toMap() {
@@ -123,7 +123,7 @@ class ConnectionOptions {
       bufferSize = parseInt(map["bufferSize"]);
       bitrate = parseInt(map["bitrate"]);
       dataBits = map["dataBits"]?.toString();
-      parityBit = map["parityBit"];
+      parityBit = map["parityBit"]?.toString();
       stopBits = map["stopBits"]?.toString();
       dataBits = map["dataBits"]?.toString();
       ctsFlowControl = parseBool(map["ctsFlowControl"]);
@@ -252,8 +252,8 @@ class SendInfo {
   String error;
 
   fromMap(Map map) {
-    bytesSent = map["bytesSent"];
-    error = map["error"];
+    bytesSent = map["bytesSent"] as int;
+    error = map["error"] as String;
   }
 
   Map toMap() {
@@ -423,7 +423,7 @@ class Serial {
     _infoSubscription = _eventBus.on<_SerialDataMapEvent>()
         // ignore: strong_mode_uses_dynamic_as_bottom
         .listen((event) async {
-      Map map = event.data;
+      var map = event.data;
 
       //devPrint(map);
       // extra completed validation
@@ -477,7 +477,7 @@ class Serial {
       // fire event when receiving map info
       Map<String, dynamic> map;
       try {
-        map = parseJsonObject(data);
+        map = parseJsonObject(data as String);
       } catch (e) {
         print(e);
       }
@@ -526,7 +526,7 @@ class Serial {
     _receiveSubscription =
         // ignore: strong_mode_uses_dynamic_as_bottom
         _eventBus.on<_SerialDataMapEvent>().listen((event) {
-      Map map = event.data;
+      var map = event.data;
       //devPrint("recv data $map");
       Message message = Message.parseMap(map);
       if (message is Notification) {
@@ -538,7 +538,7 @@ class Serial {
             if (data is String) {
               _serialStreamChannel._streamController.add(parseHexString(data));
             } else if (data is List) {
-              _serialStreamChannel._streamController.add(data);
+              _serialStreamChannel._streamController.add(data?.cast<int>());
             } else {
               print('data ${data.runtimeType} not supported');
             }
@@ -617,7 +617,7 @@ class Serial {
         // ignore: strong_mode_uses_dynamic_as_bottom
         _eventBus.on<_SerialDataMapEvent>().listen((event) {
       if (!completer.isCompleted) {
-        Map map = event.data;
+        var map = event.data;
         //devPrint("got $map");
         Message message = Message.parseMap(map);
 
@@ -654,7 +654,7 @@ class Serial {
         new Request(_nextRequestId, methodInit, clientInfo?.toMap());
     Response response = await _sendRequest(request);
 
-    return response.result;
+    return response.result as bool;
   }
 
   Future<List<DeviceInfo>> getDevices() async {
@@ -691,7 +691,7 @@ class Serial {
     Request request = new Request(_nextRequestId, methodConnect, params);
     Response response = await _sendRequest(request);
 
-    ConnectionInfo info = new ConnectionInfo()..fromMap(response.result);
+    ConnectionInfo info = new ConnectionInfo()..fromMap(response.result as Map);
     if (info.connectionId == null) {
       throw new Exception("connection failed");
     }
@@ -710,7 +710,7 @@ class Serial {
     serialStreamChannel._close();
     _serialStreamChannels[connectionId] = null;
 
-    return response.result;
+    return response.result as bool;
   }
 
   Future<bool> flush(int connectionId) async {
@@ -720,7 +720,7 @@ class Serial {
     Request request = new Request(_nextRequestId, methodFlush, params);
     Response response = await _sendRequest(request);
 
-    return response.result;
+    return response.result as bool;
   }
 
   Future<SendInfo> send(int connectionId, List<int> data) async {
@@ -731,7 +731,7 @@ class Serial {
     Request request = new DataSendRequest(_nextRequestId, connectionId, data);
     Response response = await _sendRequest(request);
 
-    SendInfo info = new SendInfo()..fromMap(response.result);
+    SendInfo info = new SendInfo()..fromMap(response.result as Map);
 
     return info;
   }

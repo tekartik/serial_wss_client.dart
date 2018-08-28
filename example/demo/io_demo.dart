@@ -1,10 +1,10 @@
-import 'package:tekartik_serial_wss_client/channel/client/io.dart';
+import 'package:tekartik_web_socket_io/web_socket_io.dart';
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 import 'package:tekartik_serial_wss_client/service/serial_wss_client_service.dart';
 
 main() async {
   SerialWssClientService service =
-      new SerialWssClientService(ioWebSocketClientChannelFactory);
+      new SerialWssClientService(webSocketChannelClientFactoryIo);
   service.start();
 
   service.onConnected.listen((bool connected) async {
