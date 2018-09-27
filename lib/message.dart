@@ -39,18 +39,18 @@ abstract class Message {
           }
           return new ErrorResponse(
               id,
-              new Error(
-                  errorMap['code'], errorMap['message'], errorMap['data']));
+              new Error(errorMap['code'] as int, errorMap['message'] as String,
+                  errorMap['data']));
         }
       } else {
-        return new Request(id, map['method'], map['params']);
+        return new Request(id, map['method'] as String, map['params']);
       }
     } else {
       // notification
       if (map['method'] == null) {
         throw new FormatException("missing 'method' or 'id' in $map");
       }
-      return new Notification(map['method'], map['params']);
+      return new Notification(map['method'] as String, map['params']);
     }
   }
 }

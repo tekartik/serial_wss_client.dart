@@ -7,5 +7,5 @@ dartanalyzer --fatal-warnings .
 
 pub run test -p vm,firefox,chrome -j 1
 
-# test dartdevc support
-pub build example/menu_web --web-compiler=dartdevc
+# test build support support
+pub run build_runner build example_web

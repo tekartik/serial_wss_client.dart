@@ -4,7 +4,7 @@ import 'dart:typed_data';
 //import 'package:tekartik_serial_wss_client/message.dart';
 import 'package:tekartik_serial_wss_client/message.dart' as swss;
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
-import 'package:tekartik_test_menu/test_menu_mdl_browser.dart';
+import 'package:tekartik_test_menu_browser/test_menu_mdl_browser.dart';
 import 'package:web_socket_channel/html.dart';
 //import 'package:dart2_constant/convert.dart';
 
@@ -128,7 +128,7 @@ terminalMenu() {
       dataSubscription = null;
     } else if (serialStreamChannel != null) {
       serialStreamChannel.stream
-          .transform(UTF8.decoder)
+          .transform(utf8.decoder)
           .transform(const LineSplitter())
           .listen((line) {
         write('line: $line');
@@ -153,8 +153,7 @@ terminalMenu() {
   item('serial send data', () async {
     if (serialStreamChannel != null) {
       write(
-          "send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId,
-          new Uint8List.fromList("hello from client".codeUnits))}");
+          "send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId, new Uint8List.fromList("hello from client".codeUnits))}");
     } else {
       write('not connected');
     }
@@ -163,8 +162,7 @@ terminalMenu() {
   _send(String cmd) async {
     if (serialStreamChannel != null) {
       write(
-          "send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId,
-          new Uint8List.fromList(cmd.codeUnits))}");
+          "send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId, new Uint8List.fromList(cmd.codeUnits))}");
     } else {
       write('not connected');
     }

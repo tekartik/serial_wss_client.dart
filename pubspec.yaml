@@ -1,32 +1,68 @@
 name: tekartik_serial_wss_client
 description: A starting point for Dart libraries or applications.
-version: 0.6.1
+version: 0.7.2
 #homepage: https://www.example.com
 #author: alex <email@example.com>
 
 environment:
-  sdk: '>=1.20.1 <2.0.0'
+  sdk: '>=2.0.0-dev.58 <3.0.0'
 
 dependencies:
-  func: any
   event_bus: any
   web_socket_channel: any
   tekartik_common_utils:
-    git: git://github.com/tekartik/common_utils.dart
+    git:
+      url: git://github.com/tekartik/common_utils.dart
+      ref: dart2
     version: '>=0.4.9'
   dart2_constant: any
+  tekartik_web_socket:
+    git:
+      url: git://github.com/tekartik/web_socket.dart
+      path: web_socket
+      ref: dart2
+    version: '>=0.1.0'
 
 dev_dependencies:
   test: any
   dev_test: any
-  tekartik_test_menu:
-    git: git://github.com/tekartik/test_menu.dart
+  tekartik_test_menu_browser:
+    git:
+      url: git://github.com/tekartik/test_menu.dart
+      ref: dart2
+      path: test_menu_browser
+    version: '>=0.4.5'
+  tekartik_test_menu_io:
+    git:
+      url: git://github.com/tekartik/test_menu.dart
+      ref: dart2
+      path: test_menu_io
     version: '>=0.4.5'
   tekartik_serial_wss_sim:
-    git: git://github.com/tekartik/serial_wss_sim.dart
-    version: '>=0.2.0'
+    git:
+      url: git://github.com/tekartik/serial_wss_sim.dart
+      ref: dart2
+    version: '>=0.3.1'
+  tekartik_web_socket_io:
+    git:
+      url: git://github.com/tekartik/web_socket.dart
+      path: web_socket_io
+      ref: dart2
+    version: '>=0.1.0'
+  tekartik_web_socket_browser:
+    git:
+      url: git://github.com/tekartik/web_socket.dart
+      path: web_socket_browser
+      ref: dart2
+    version: '>=0.1.0'
+
   chrome_travis:
-    git: git://github.com/tekartik/chrome_travis.dart
+    git:
+      url: git://github.com/tekartik/chrome_travis.dart
+      ref: dart2
+  build_runner: '>=0.9.0'
+  build_test: '>=0.10.0'
+  build_web_compilers: '>=0.4.2'
 
 dependency_overrides:
 #  tekartik_serial_wss_sim:
