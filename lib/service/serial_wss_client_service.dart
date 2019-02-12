@@ -8,7 +8,7 @@ import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 import 'package:tekartik_common_utils/string_utils.dart';
 
 class SerialWssClientService {
-  static DevFlag debug = new DevFlag("SerialWssClientService debug");
+  static DevFlag debug = DevFlag("SerialWssClientService debug");
   // the serial service when connected
   Serial get serial => _serial;
 
@@ -45,12 +45,12 @@ class SerialWssClientService {
       {String url, SerialClientInfo clientInfo, Duration retryDelay})
       : clientInfo = clientInfo,
         _factory = factory,
-        _onConnectErrorController = new StreamController.broadcast(),
-        _onConnectedController = new StreamController.broadcast()
+        _onConnectErrorController = StreamController.broadcast(),
+        _onConnectedController = StreamController.broadcast()
   //_onErrorController = new StreamController.broadcast()
   {
     _url = url;
-    this._retryDelay = retryDelay ?? new Duration(seconds: 3);
+    this._retryDelay = retryDelay ?? Duration(seconds: 3);
   }
 
   // must be started explicitely
@@ -61,7 +61,7 @@ class SerialWssClientService {
     }
   }
 
-  _tryConnect() async {
+  Future _tryConnect() async {
     try {
       await _connect();
     } catch (e) {
@@ -72,7 +72,7 @@ class SerialWssClientService {
     }
   }
 
-  _onDisconnect() {
+  void _onDisconnect() {
     if (debug.on) {
       print('[SerialWssClientService] _onDisconnect');
     }
@@ -85,7 +85,7 @@ class SerialWssClientService {
     }
   }
 
-  _connect() async {
+  Future _connect() async {
     if (!isConnected) {
       await _lock.synchronized(() async {
         if (!isConnected) {
@@ -102,8 +102,8 @@ class SerialWssClientService {
             rethrow;
           }
 
-          Serial serial = new Serial(wsChannel, clientInfo: clientInfo,
-              onDataReceived: (data) {
+          Serial serial =
+              Serial(wsChannel, clientInfo: clientInfo, onDataReceived: (data) {
             /*
       if (logJson) {
       bool _log = true;
@@ -162,7 +162,7 @@ class SerialWssClientService {
     if (isConnected) {
       await _lock.synchronized(() async {
         if (isConnected) {
-          await serial.close();
+          serial.close();
           _serial = null;
         }
       });
@@ -177,13 +177,13 @@ class SerialWssClientService {
 
   Future waitForConnected(bool connected) async {
     if (isConnected == connected) {
-      return new Future.value();
+      return Future.value();
     }
     StreamSubscription subscription;
-    var completer = new Completer();
-    subscription = onConnected.listen((bool connected_) async {
-      if (connected_ == connected) {
-        subscription.cancel();
+    var completer = Completer();
+    subscription = onConnected.listen((bool newConnected) async {
+      if (newConnected == connected) {
+        await subscription.cancel();
         completer.complete();
       }
     });

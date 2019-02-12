@@ -8,6 +8,7 @@ library serial_wss_client;
 
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:pedantic/pedantic.dart';
 import 'package:stream_channel/stream_channel.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:tekartik_common_utils/version_utils.dart';
@@ -20,10 +21,10 @@ import 'package:tekartik_common_utils/hex_utils.dart';
 
 // Minimum expected server version
 // Best is however 0.6.0 at this point
-Version minVersion = new Version(0, 5, 0);
+Version minVersion = Version(0, 5, 0);
 
 const int _maxQueryId = 10000;
-const Duration requestTimeoutDuration = const Duration(milliseconds: 5000);
+const Duration requestTimeoutDuration = Duration(milliseconds: 5000);
 
 // Broadcast when serial is done
 class _SerialDoneEvent {}
@@ -40,15 +41,15 @@ class DeviceInfo {
   int productId;
   String displayName;
 
-  fromMap(Map map) {
+  void fromMap(Map map) {
     path = map["path"] as String;
     vendorId = map["vendorId"] as int;
     productId = map["productId"] as int;
     displayName = map["displayName"] as String;
   }
 
-  toMap() {
-    Map map = {};
+  Map<String, dynamic> toMap() {
+    var map = <String, dynamic>{};
     if (path != null) {
       map['path'] = path;
     }
@@ -65,7 +66,7 @@ class DeviceInfo {
   }
 
   @override
-  toString() {
+  String toString() {
     return displayName ?? path;
   }
 }
@@ -116,7 +117,7 @@ class ConnectionOptions {
   int receiveTimeout;
   int sendTimeout;
 
-  fromMap(Map map) {
+  void fromMap(Map map) {
     if (map != null) {
       persistent = parseBool(map["persistent"]);
       name = map["name"]?.toString();
@@ -167,7 +168,8 @@ class ConnectionOptions {
     return map;
   }
 
-  toString() => toMap().toString();
+  @override
+  String toString() => toMap().toString();
 }
 
 // ConnectionInfo
@@ -211,11 +213,13 @@ See ConnectionOptions.ctsFlowControl. This field may be omitted if an error occu
 class ConnectionInfo extends ConnectionOptions {
   int connectionId;
 
-  fromMap(Map map) {
+  @override
+  void fromMap(Map map) {
     super.fromMap(map);
     connectionId = parseInt(map["connectionId"]);
   }
 
+  @override
   Map toMap() {
     Map map = super.toMap();
     if (connectionId != null) {
@@ -224,7 +228,8 @@ class ConnectionInfo extends ConnectionOptions {
     return map;
   }
 
-  toString() => '${toMap()}';
+  @override
+  String toString() => '${toMap()}';
 }
 
 /*
@@ -251,7 +256,7 @@ class SendInfo {
   int bytesSent;
   String error;
 
-  fromMap(Map map) {
+  void fromMap(Map map) {
     bytesSent = map["bytesSent"] as int;
     error = map["error"] as String;
   }
@@ -265,7 +270,8 @@ class SendInfo {
     return map;
   }
 
-  toString() => '${toMap()}';
+  @override
+  String toString() => '${toMap()}';
 }
 
 class SerialServerVersionException implements Exception {
@@ -273,6 +279,7 @@ class SerialServerVersionException implements Exception {
 
   SerialServerVersionException(this.serverVersion);
 
+  @override
   String toString() {
     return "SerialServerVersionException: Server version ${serverVersion} not supported. Version min ${minVersion} required";
   }
@@ -290,13 +297,13 @@ class SerialClientInfo {
 class _SerialStreamSink implements StreamSink<List<int>> {
   final SerialStreamChannel channel;
 
-  Completer doneCompleter = new Completer();
+  Completer doneCompleter = Completer();
   _SerialStreamSink(this.channel);
 
   @override
   void add(List<int> data) {
-    channel._serial.send(
-        channel.connectionInfo.connectionId, new Uint8List.fromList(data));
+    channel._serial
+        .send(channel.connectionInfo.connectionId, Uint8List.fromList(data));
   }
 
   @override
@@ -306,7 +313,7 @@ class _SerialStreamSink implements StreamSink<List<int>> {
 
   @override
   Future addStream(Stream<List<int>> stream) {
-    Completer completer = new Completer();
+    Completer completer = Completer();
     stream.listen((data) => add(data)).onDone(() {
       completer.complete();
     });
@@ -339,12 +346,12 @@ class SerialStreamChannel extends StreamChannelMixin<List<int>> {
   final Serial _serial;
   final String path;
   final ConnectionInfo connectionInfo;
-  StreamController<List<int>> _streamController = new StreamController();
+  StreamController<List<int>> _streamController = StreamController();
 
   _SerialStreamSink _sink;
 
   SerialStreamChannel._(this._serial, this.path, this.connectionInfo) {
-    _sink = new _SerialStreamSink(this);
+    _sink = _SerialStreamSink(this);
   }
 
   @override
@@ -357,9 +364,9 @@ class SerialStreamChannel extends StreamChannelMixin<List<int>> {
     await sink.close();
   }
 
-  _close() async {
-    await _streamController.close();
-    _sink._close();
+  Future _close() async {
+    unawaited(_streamController.close());
+    await _sink._close();
   }
 
   int get connectionId => connectionInfo.connectionId;
@@ -369,7 +376,7 @@ class SerialStreamChannel extends StreamChannelMixin<List<int>> {
 }
 
 class Serial {
-  static DevFlag debug = new DevFlag("Serial debug");
+  static DevFlag debug = DevFlag("Serial debug");
 
   StreamChannel _streamChannel;
   bool _done = false;
@@ -386,13 +393,13 @@ class Serial {
   StreamSubscription _receiveSubscription;
   // receiving info - first step
   StreamSubscription _infoSubscription;
-  Completer<bool> _connectedCompleter = new Completer();
-  EventBus _eventBus = new EventBus();
+  Completer<bool> _connectedCompleter = Completer();
+  EventBus _eventBus = EventBus();
   bool _connected = false;
 
   bool get isConnected => _connected;
 
-  Duration commandTimeOutDuration = new Duration(seconds: 5);
+  Duration commandTimeOutDuration = const Duration(seconds: 5);
 
   //StreamController<List<int>> _onReceiveController = new StreamController();
   //Stream<List<int>> get onReceive => _onReceiveController.stream;
@@ -443,7 +450,7 @@ class Serial {
                     // Check version, for now >= 0.1
                     if (serverVersion < minVersion) {
                       _connectedCompleter.completeError(
-                          new SerialServerVersionException(serverVersion));
+                          SerialServerVersionException(serverVersion));
                       return;
                     } else {
                       // stop info subscription and send init
@@ -461,7 +468,7 @@ class Serial {
               }
             }
           }
-        } catch (e) {}
+        } catch (_) {}
       }
     });
 
@@ -483,7 +490,7 @@ class Serial {
       }
       if (map != null) {
         //devPrint("firing $map");
-        _eventBus.fire(new _SerialDataMapEvent(map));
+        _eventBus.fire(_SerialDataMapEvent(map));
       }
     }, onError: (error) {
       if (debug.on) {
@@ -500,7 +507,7 @@ class Serial {
       if (debug.on) {
         print("[Serial] onDone");
       }
-      _eventBus.fire(new _SerialDoneEvent());
+      _eventBus.fire(_SerialDoneEvent());
       _done = true;
       _connected = false;
       if (onDone != null) {
@@ -517,12 +524,12 @@ class Serial {
     });
   }
 
-  _stopInfoSubscription() {
+  void _stopInfoSubscription() {
     _infoSubscription?.cancel();
     _infoSubscription = null;
   }
 
-  _startReceiveSubscription() {
+  void _startReceiveSubscription() {
     _receiveSubscription =
         // ignore: strong_mode_uses_dynamic_as_bottom
         _eventBus.on<_SerialDataMapEvent>().listen((event) {
@@ -571,7 +578,7 @@ class Serial {
   // Bind to a websocket channel, either succeed, in which case
   Future<bool> get connected => _connectedCompleter.future;
 
-  sendMessage(Message message) {
+  void sendMessage(Message message) {
     if (debug.on) {
       print("[Serial] send: ${json.encode(message.toMap())}");
     }
@@ -585,7 +592,7 @@ class Serial {
     //}
   }
 
-  close() {
+  void close() {
     if (!_done) {
       try {
         _streamChannel.sink.close();
@@ -603,7 +610,7 @@ class Serial {
       }
     }
 
-    Completer<Response> completer = new Completer();
+    Completer<Response> completer = Completer();
     StreamSubscription<_SerialDataMapEvent> subscription;
 
     // Support when serial is done globally...
@@ -641,17 +648,16 @@ class Serial {
       return await completer.future.timeout(requestTimeoutDuration);
     } finally {
       if (subscription != null) {
-        subscription.cancel();
+        await subscription.cancel();
       }
-      doneSubscription.cancel();
+      await doneSubscription.cancel();
     }
   }
 
   Future<bool> _init(SerialClientInfo clientInfo) async {
     // --> {"jsonrpc": "2.0","id": 1,"method": "init"}
     // <-- {"jsonrpc": "2.0","id": 1,"result": true}
-    Request request =
-        new Request(_nextRequestId, methodInit, clientInfo?.toMap());
+    Request request = Request(_nextRequestId, methodInit, clientInfo?.toMap());
     Response response = await _sendRequest(request);
 
     return response.result as bool;
@@ -660,13 +666,13 @@ class Serial {
   Future<List<DeviceInfo>> getDevices() async {
     // --> {"jsonrpc":"2.0","id":2,"method":"getDevices"}
     // <-- {"jsonrpc":"2.0","id":1,"result":[{"path":"/dev/ttyUSB0","vendorId":1027,"productId":24577,"displayName":"FT232R_USB_UART"}]}
-    Request request = new Request(_nextRequestId, methodGetDevices);
+    Request request = Request(_nextRequestId, methodGetDevices);
     Response response = await _sendRequest(request);
 
     List<DeviceInfo> list = [];
     List<Map> deviceInfoMaps = response.result;
     for (Map deviceInfoMap in deviceInfoMaps) {
-      list.add(new DeviceInfo()..fromMap(deviceInfoMap));
+      list.add(DeviceInfo()..fromMap(deviceInfoMap));
     }
     return list;
   }
@@ -675,7 +681,7 @@ class Serial {
       {ConnectionOptions options}) async {
     ConnectionInfo info = await connect(path, options: options);
 
-    var serialStreamChannel = new SerialStreamChannel._(this, path, info);
+    var serialStreamChannel = SerialStreamChannel._(this, path, info);
     _serialStreamChannels[info.connectionId] = serialStreamChannel;
     return serialStreamChannel;
   }
@@ -688,12 +694,12 @@ class Serial {
     if (options != null) {
       params["options"] = options.toMap();
     }
-    Request request = new Request(_nextRequestId, methodConnect, params);
+    Request request = Request(_nextRequestId, methodConnect, params);
     Response response = await _sendRequest(request);
 
-    ConnectionInfo info = new ConnectionInfo()..fromMap(response.result as Map);
+    ConnectionInfo info = ConnectionInfo()..fromMap(response.result as Map);
     if (info.connectionId == null) {
-      throw new Exception("connection failed");
+      throw Exception("connection failed");
     }
     return info;
   }
@@ -702,12 +708,12 @@ class Serial {
     // --> {"jsonrpc":"2.0","id":18,"method":"disconnect","params":{"connectionId":6}},
     // <-- {"jsonrpc":"2.0","id":21,"result":true}
     Map params = {"connectionId": connectionId};
-    Request request = new Request(_nextRequestId, methodDisconnect, params);
+    Request request = Request(_nextRequestId, methodDisconnect, params);
     Response response = await _sendRequest(request);
 
     // clean channel
     var serialStreamChannel = _serialStreamChannels[connectionId];
-    serialStreamChannel._close();
+    await serialStreamChannel._close();
     _serialStreamChannels[connectionId] = null;
 
     return response.result as bool;
@@ -717,7 +723,7 @@ class Serial {
     // --> {"jsonrpc":"2.0","id":18,"method":"disconnect","params":{"connectionId":6}},
     // <-- {"jsonrpc":"2.0","id":21,"result":true}
     Map params = {"connectionId": connectionId};
-    Request request = new Request(_nextRequestId, methodFlush, params);
+    Request request = Request(_nextRequestId, methodFlush, params);
     Response response = await _sendRequest(request);
 
     return response.result as bool;
@@ -728,10 +734,10 @@ class Serial {
     // recv String {"jsonrpc":"2.0","id":5,"result":{"bytesSent":17,"error":"pending"}}
     // recv String {"jsonrpc":"2.0","id":5,"result":{"bytesSent":0,"error":"pending"}}
     //Map params = {"connectionId": connectionId, "data": toHexString(data)};
-    Request request = new DataSendRequest(_nextRequestId, connectionId, data);
+    Request request = DataSendRequest(_nextRequestId, connectionId, data);
     Response response = await _sendRequest(request);
 
-    SendInfo info = new SendInfo()..fromMap(response.result as Map);
+    SendInfo info = SendInfo()..fromMap(response.result as Map);
 
     return info;
   }

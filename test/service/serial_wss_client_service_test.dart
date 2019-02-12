@@ -9,24 +9,24 @@ import 'package:tekartik_serial_wss_client/service/serial_wss_client_service.dar
 import 'package:tekartik_serial_wss_client/src/common_import.dart';
 import 'package:tekartik_serial_wss_sim/serial_wss_sim.dart';
 
-main() {
+void main() {
   group('client_service_memory', () {
     test('default', () async {
       SerialWssClientService service =
-          new SerialWssClientService(webSocketChannelClientFactoryMemory);
+          SerialWssClientService(webSocketChannelClientFactoryMemory);
       expect(service.url, getSerialWssUrl());
       await service.changeUrl(null);
       expect(service.url, getSerialWssUrl());
     });
   });
-  test_main(webSocketChannelFactoryMemory);
+  testMain(webSocketChannelFactoryMemory);
 }
 
-test_main(WebSocketChannelFactory channelFactory) {
+void testMain(WebSocketChannelFactory channelFactory) {
   group('client_service', () {
     test('default', () async {
       SerialWssClientService service =
-          new SerialWssClientService(channelFactory.client);
+          SerialWssClientService(channelFactory.client);
       expect(service.url, getSerialWssUrl());
       await service.changeUrl(null);
       expect(service.url, getSerialWssUrl());
@@ -34,16 +34,16 @@ test_main(WebSocketChannelFactory channelFactory) {
 
     test('invalid_url', () async {
       SerialWssClientService service =
-          new SerialWssClientService(channelFactory.client, url: "dummy");
-      await service.start();
+          SerialWssClientService(channelFactory.client, url: "dummy");
+      service.start();
       await service.changeUrl("another dummy");
       await service.stop();
     });
     test('start_stop', () async {
       var server = await SerialServer.start(channelFactory.server, port: 0);
       SerialWssClientService service =
-          new SerialWssClientService(channelFactory.client, url: server.url);
-      var completer = new Completer();
+          SerialWssClientService(channelFactory.client, url: server.url);
+      var completer = Completer();
       //expect(service.url, getSerialWssUrl(port: server.port));
 
       service.start();
@@ -64,13 +64,13 @@ test_main(WebSocketChannelFactory channelFactory) {
       //SerialWssClientService.debug.on = true;
       var server = await SerialServer.start(channelFactory.server, port: 0);
       SerialWssClientService service =
-          new SerialWssClientService(channelFactory.client, url: server.url);
+          SerialWssClientService(channelFactory.client, url: server.url);
 
       service.start();
       await service.waitForConnected(true);
       await service.stop();
       expect(service.isConnected, isFalse);
-      await service.start();
+      service.start();
       await service.waitForConnected(true);
       await service.stop();
       expect(service.isConnected, isFalse);
@@ -86,9 +86,9 @@ test_main(WebSocketChannelFactory channelFactory) {
       int port = server.port;
       await server.close();
 
-      SerialWssClientService service = new SerialWssClientService(
+      SerialWssClientService service = SerialWssClientService(
           channelFactory.client,
-          retryDelay: new Duration(milliseconds: 100),
+          retryDelay: Duration(milliseconds: 100),
           url: server.url);
       service.start();
 
@@ -114,7 +114,7 @@ test_main(WebSocketChannelFactory channelFactory) {
       var server2 = await SerialServer.start(channelFactory.server, port: 0);
 
       SerialWssClientService service =
-          new SerialWssClientService(channelFactory.client,
+          SerialWssClientService(channelFactory.client,
               //retryDelay: new Duration(milliseconds: timeScale * 2),
               url: server1.url);
       service.start();
@@ -141,13 +141,13 @@ test_main(WebSocketChannelFactory channelFactory) {
       var server = await SerialServer.start(channelFactory.server, port: 0);
       await server.close();
 
-      SerialWssClientService wssService = new SerialWssClientService(
+      SerialWssClientService wssService = SerialWssClientService(
           channelFactory.client,
-          retryDelay: new Duration(milliseconds: 100),
+          retryDelay: Duration(milliseconds: 100),
           url: server.url);
       wssService.start();
 
-      Completer completer = new Completer();
+      Completer completer = Completer();
       wssService.onConnectError.listen((error) {
         if (!completer.isCompleted) {
           completer.complete();

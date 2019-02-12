@@ -5,7 +5,7 @@ import 'package:tekartik_serial_wss_client/service/serial_stream_channel_service
 import 'package:tekartik_serial_wss_client/service/serial_wss_client_service.dart';
 import 'package:tekartik_test_menu_browser/test_menu_mdl_browser.dart';
 
-wssStreamChannelServiceMenu(
+void wssStreamChannelServiceMenu(
     WebSocketChannelClientFactory clientChannelFactory) {
   String path;
 
@@ -15,10 +15,10 @@ wssStreamChannelServiceMenu(
   SerialWssClientService.debug.on = true;
   // ignore: deprecated_member_use
   SerialStreamChannelService.debug.on = true;
-  SerialWssClientService wssClientService = new SerialWssClientService(
+  SerialWssClientService wssClientService = SerialWssClientService(
       clientChannelFactory); //, url: serialWssUrlDefault);
   SerialStreamChannelService service =
-      new SerialStreamChannelService(wssClientService);
+      SerialStreamChannelService(wssClientService);
 
   wssClientService.onConnected.listen((bool connected) async {
     write("connected $connected");

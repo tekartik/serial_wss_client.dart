@@ -1,12 +1,13 @@
-import 'package:dev_test/test.dart';
-import 'package:tekartik_serial_wss_client/message.dart';
 import 'dart:core' hide Error;
 
-main() {
+import 'package:dev_test/test.dart';
+import 'package:tekartik_serial_wss_client/message.dart';
+
+void main() {
   group('message', () {
     group('create', () {
       test('request', () {
-        Request request = new Request(1, "test", ["value"]);
+        Request request = Request(1, "test", ["value"]);
         expect(request.toMap(), {
           "jsonrpc": "2.0",
           "id": 1,
@@ -14,41 +15,40 @@ main() {
           "params": ["value"]
         });
 
-        request = new Request(1, "test");
+        request = Request(1, "test");
         expect(request.toMap(), {"jsonrpc": "2.0", "id": 1, "method": "test"});
       });
 
       test('notification', () {
-        Notification notification = new Notification("test", ["value"]);
+        Notification notification = Notification("test", ["value"]);
         expect(notification.toMap(), {
           "jsonrpc": "2.0",
           "method": "test",
           "params": ["value"]
         });
-        notification = new Notification("test");
+        notification = Notification("test");
         expect(notification.toMap(), {"jsonrpc": "2.0", "method": "test"});
       });
 
       test('response', () {
-        Response response = new Response(1, ["value"]);
+        Response response = Response(1, ["value"]);
         expect(response.toMap(), {
           "jsonrpc": "2.0",
           "id": 1,
           "result": ["value"]
         });
-        response = new Response(1, null);
+        response = Response(1, null);
         expect(response.toMap(), {"jsonrpc": "2.0", "id": 1, "result": null});
       });
 
       test('response_error', () {
-        ErrorResponse response =
-            new ErrorResponse(1, new Error(2, "msg", "err_data"));
+        ErrorResponse response = ErrorResponse(1, Error(2, "msg", "err_data"));
         expect(response.toMap(), {
           "jsonrpc": "2.0",
           "id": 1,
           "error": {"code": 2, "message": "msg", "data": "err_data"}
         });
-        response = new ErrorResponse(1, new Error(2, "msg"));
+        response = ErrorResponse(1, Error(2, "msg"));
         expect(response.toMap(), {
           "jsonrpc": "2.0",
           "id": 1,
