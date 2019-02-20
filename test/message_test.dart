@@ -58,43 +58,43 @@ void main() {
     });
     group('parse', () {
       test('request', () {
-        Request request = Message.parseMap({
+        final request = Message.parseMap({
           "jsonrpc": "2.0",
           "id": 1,
           "method": "test",
           "params": ["value"]
-        });
+        }) as Request;
 
         expect(request.id, 1);
         expect(request.method, "test");
         expect(request.params, ["value"]);
       });
       test('notification', () {
-        Notification notification = Message.parseMap({
+        final notification = Message.parseMap({
           "jsonrpc": "2.0",
           "method": "test",
           "params": ["value"]
-        });
+        }) as Notification;
 
         expect(notification.method, "test");
         expect(notification.params, ["value"]);
       });
       test('response', () {
-        Response response = Message.parseMap({
+        final response = Message.parseMap({
           "jsonrpc": "2.0",
           "id": 1,
           "result": ["value"]
-        });
+        }) as Response;
 
         expect(response.id, 1);
         expect(response.result, ["value"]);
       });
       test('error_response', () {
-        ErrorResponse response = Message.parseMap({
+        final response = Message.parseMap({
           "jsonrpc": "2.0",
           "id": 1,
           "error": {"code": 2, "message": "msg", "data": "err_data"}
-        });
+        }) as ErrorResponse;
 
         expect(response.id, 1);
         expect(response.error.code, 2);

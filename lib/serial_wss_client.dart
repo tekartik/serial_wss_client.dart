@@ -439,11 +439,11 @@ class Serial {
           Message message = Message.parseMap(map);
           if (message is Notification) {
             if (message.method == methodInfo) {
-              Map info = message.params;
+              final info = message.params as Map;
               var package = info["package"];
               if (package is String) {
                 if (package.startsWith(serialWssPackagePrefix)) {
-                  String versionText = info["version"];
+                  final versionText = info["version"] as String;
                   if (versionText is String) {
                     serverVersion = parseVersion(versionText);
 
@@ -538,7 +538,7 @@ class Serial {
       Message message = Message.parseMap(map);
       if (message is Notification) {
         if (message.method == methodReceive) {
-          int connectionId = message.params['connectionId'];
+          final connectionId = message.params['connectionId'] as int;
           var _serialStreamChannel = _serialStreamChannels[connectionId];
           if (_serialStreamChannel != null) {
             var data = message.params['data'];
@@ -553,7 +553,7 @@ class Serial {
             print('nobody to listen to received data');
           }
         } else if (message.method == methodError) {
-          int connectionId = message.params['connectionId'];
+          final connectionId = message.params['connectionId'] as int;
           var _serialStreamChannel = _serialStreamChannels[connectionId];
           if (_serialStreamChannel != null) {
             var error = message.params['error'];
@@ -562,7 +562,7 @@ class Serial {
             print('nobody to listen to error');
           }
         } else if (message.method == methodDisconnected) {
-          int connectionId = message.params['connectionId'];
+          final connectionId = message.params['connectionId'] as int;
           var _serialStreamChannel = _serialStreamChannels[connectionId];
           if (_serialStreamChannel != null) {
             _serialStreamChannel._close();
@@ -670,7 +670,7 @@ class Serial {
     Response response = await _sendRequest(request);
 
     List<DeviceInfo> list = [];
-    List<Map> deviceInfoMaps = response.result;
+    final deviceInfoMaps = (response.result as List).cast<Map>();
     for (Map deviceInfoMap in deviceInfoMaps) {
       list.add(DeviceInfo()..fromMap(deviceInfoMap));
     }

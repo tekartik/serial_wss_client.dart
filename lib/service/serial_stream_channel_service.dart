@@ -141,7 +141,7 @@ class SerialStreamChannelService {
         _onOpenErrorController = StreamController.broadcast(),
         _sinkStreamController = StreamController.broadcast(),
         _serialWssClientService = serialWssClientService {
-    this._retryDelay = retryDelay ?? Duration(seconds: 3);
+    this._retryDelay = retryDelay ?? const Duration(seconds: 3);
     _sink = _SerialStreamChannelServiceSink(this);
     _channel = _SerialStreamChannel(this);
     _serialWssClientService.onConnected.listen(_onConnected);

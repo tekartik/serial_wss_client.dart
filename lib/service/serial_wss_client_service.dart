@@ -50,7 +50,7 @@ class SerialWssClientService {
   //_onErrorController = new StreamController.broadcast()
   {
     _url = url;
-    this._retryDelay = retryDelay ?? Duration(seconds: 3);
+    this._retryDelay = retryDelay ?? const Duration(seconds: 3);
   }
 
   // must be started explicitely

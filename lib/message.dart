@@ -32,7 +32,7 @@ abstract class Message {
         if (map.containsKey('result')) {
           return Response(id, map['result']);
         } else {
-          Map errorMap = map['error'];
+          final errorMap = map['error'] as Map;
           if (errorMap == null) {
             throw FormatException(
                 "missing 'method', 'result' or 'error' in $map");

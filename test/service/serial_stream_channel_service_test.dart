@@ -36,7 +36,7 @@ void testMain(WebSocketChannelFactory channelFactory) {
 
       SerialWssClientService wssService = SerialWssClientService(
           channelFactory.client,
-          retryDelay: Duration(milliseconds: 100),
+          retryDelay: const Duration(milliseconds: 100),
           url: server.url);
       wssService.start();
 
@@ -64,7 +64,7 @@ void testMain(WebSocketChannelFactory channelFactory) {
 
       SerialWssClientService wssService = SerialWssClientService(
           channelFactory.client,
-          retryDelay: Duration(milliseconds: 100),
+          retryDelay: const Duration(milliseconds: 100),
           url: server.url);
       wssService.start();
 
@@ -174,7 +174,7 @@ void testMain(WebSocketChannelFactory channelFactory) {
 
       SerialWssClientService wssService = SerialWssClientService(
           channelFactory.client,
-          retryDelay: Duration(milliseconds: 100),
+          retryDelay: const Duration(milliseconds: 100),
           url: server.url);
       wssService.start();
 
@@ -195,7 +195,7 @@ void testMain(WebSocketChannelFactory channelFactory) {
 
       SerialWssClientService wssService = SerialWssClientService(
           channelFactory.client,
-          retryDelay: Duration(milliseconds: 100),
+          retryDelay: const Duration(milliseconds: 100),
           url: server.url);
       wssService.start();
 
@@ -219,7 +219,7 @@ void testMain(WebSocketChannelFactory channelFactory) {
 
       SerialWssClientService wssService = SerialWssClientService(
           channelFactory.client,
-          retryDelay: Duration(milliseconds: 100),
+          retryDelay: const Duration(milliseconds: 100),
           url: server.url);
       wssService.start();
 
@@ -242,7 +242,7 @@ void testMain(WebSocketChannelFactory channelFactory) {
 
       SerialWssClientService wssService = SerialWssClientService(
           channelFactory.client,
-          retryDelay: Duration(milliseconds: 100),
+          retryDelay: const Duration(milliseconds: 100),
           url: server.url);
       wssService.start();
 

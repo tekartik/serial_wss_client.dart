@@ -103,7 +103,7 @@ void main() {
             SerialStreamChannelService service2 = SerialStreamChannelService(
                 wssService,
                 path: path,
-                retryDelay: Duration(milliseconds: 100));
+                retryDelay: const Duration(milliseconds: 100));
             service2.start();
 
             bool wasBusy;
