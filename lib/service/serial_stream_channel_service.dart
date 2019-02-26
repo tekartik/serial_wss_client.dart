@@ -1,10 +1,12 @@
-import 'package:stream_channel/stream_channel.dart';
-import 'package:tekartik_serial_wss_client/src/common_import.dart';
-import 'package:tekartik_serial_wss_client/message.dart' as swss;
 import 'dart:async';
+
+import 'package:stream_channel/stream_channel.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:tekartik_common_utils/async_utils.dart';
+import 'package:tekartik_serial_wss_client/message.dart' as swss;
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
+import 'package:tekartik_serial_wss_client/src/common_import.dart';
+
 import 'serial_wss_client_service.dart';
 
 class _SerialStreamChannelServiceSink implements StreamSink<List<int>> {
@@ -30,7 +32,7 @@ class _SerialStreamChannelServiceSink implements StreamSink<List<int>> {
 
   @override
   Future addStream(Stream<List<int>> stream) {
-    Completer completer = new Completer();
+    Completer completer = Completer();
     stream.listen((data) => add(data)).onDone(() {
       completer.complete();
     });
@@ -62,10 +64,10 @@ class _SerialStreamChannel extends StreamChannelMixin<List<int>> {
 }
 
 class SerialStreamChannelService {
-  static DevFlag debug = new DevFlag("SerialStreamChannelService debug");
+  static DevFlag debug = DevFlag("SerialStreamChannelService debug");
 
   // this only happens on close
-  Completer _doneCompleter = new Completer();
+  Completer _doneCompleter = Completer();
 
   Future get done => _doneCompleter.future;
   Lock _lock = Lock();
@@ -86,6 +88,7 @@ class SerialStreamChannelService {
   Duration _retryDelay;
 
   bool _isStarted = false;
+
   bool get isStarted => _isStarted;
   bool _shouldStop = false;
 
@@ -95,6 +98,7 @@ class SerialStreamChannelService {
 
   // current channel if any
   SerialStreamChannel _currentChannel;
+
   SerialStreamChannel get currentChannel => _currentChannel;
 
   bool get isOpened => _currentChannel != null;
@@ -112,10 +116,12 @@ class SerialStreamChannelService {
 
   // exposed to send test data
   StreamController<List<int>> _streamController;
+
   //StreamController<List<int>> get streamController => _streamController;
 
   // exposed to get sent data (for history)
   StreamController<List<int>> _sinkStreamController;
+
   Stream<List<int>> get sinkStream => _sinkStreamController.stream;
 
   // The stream to listen to
@@ -130,25 +136,25 @@ class SerialStreamChannelService {
       {ConnectionOptions connectionOptions, String path, Duration retryDelay})
       : _connectionOptions = connectionOptions,
         _path = path,
-        _streamController = new StreamController.broadcast(),
-        _onOpenedController = new StreamController.broadcast(),
-        _onOpenErrorController = new StreamController.broadcast(),
-        _sinkStreamController = new StreamController.broadcast(),
+        _streamController = StreamController.broadcast(),
+        _onOpenedController = StreamController.broadcast(),
+        _onOpenErrorController = StreamController.broadcast(),
+        _sinkStreamController = StreamController.broadcast(),
         _serialWssClientService = serialWssClientService {
-    this._retryDelay = retryDelay ?? new Duration(seconds: 3);
-    _sink = new _SerialStreamChannelServiceSink(this);
-    _channel = new _SerialStreamChannel(this);
+    this._retryDelay = retryDelay ?? const Duration(seconds: 3);
+    _sink = _SerialStreamChannelServiceSink(this);
+    _channel = _SerialStreamChannel(this);
     _serialWssClientService.onConnected.listen(_onConnected);
   }
 
   // The service won't be used anymore
-  terminate() async {
-    stop();
+  Future terminate() async {
+    await stop();
     await _sink.close();
   }
 
   // Called when
-  _onConnected(bool connected) {
+  void _onConnected(bool connected) {
     //devPrint('[SerialStreamChannelService] onConnected($connected)');
     if (connected) {
       if (_isStarted) {
@@ -163,7 +169,7 @@ class SerialStreamChannelService {
 
   // to call to close the current potentially connection
   // and retry later
-  _onClose() {
+  void _onClose() {
     if (debug.on) {
       print('[SerialStreamChannelService] onClose $_channel');
     }
@@ -205,7 +211,7 @@ class SerialStreamChannelService {
     }
   }
 
-  _tryOpen() async {
+  Future _tryOpen() async {
     if (_isStarted && _serialWssClientService.isConnected && !isOpened) {
       await _openCloseLock.synchronized(() async {
         if (!isOpened) {
@@ -245,7 +251,7 @@ class SerialStreamChannelService {
     //devPrint('[SerialStreamChannelService] _close2(isOpened = $isOpened)');
   }
 
-  _open() async {
+  Future _open() async {
     if (!isOpened) {
       await _lock.synchronized(() async {
         if (!isOpened) {
@@ -325,13 +331,13 @@ class SerialStreamChannelService {
 
   Future waitForOpen(bool opened) async {
     if (isOpened == opened) {
-      return new Future.value();
+      return Future.value();
     }
     StreamSubscription subscription;
-    var completer = new Completer();
-    subscription = onOpened.listen((bool opened_) async {
-      if (opened_ == opened) {
-        subscription.cancel();
+    var completer = Completer();
+    subscription = onOpened.listen((bool newOpened) async {
+      if (newOpened == opened) {
+        await subscription.cancel();
         completer.complete();
       }
     });

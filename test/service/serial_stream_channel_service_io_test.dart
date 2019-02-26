@@ -1,5 +1,4 @@
 @TestOn("vm")
-library _;
 
 import 'dart:core' hide Error;
 
@@ -8,6 +7,6 @@ import 'package:tekartik_web_socket_io/web_socket_io.dart';
 
 import 'serial_wss_client_service_test.dart';
 
-main() {
-  test_main(webSocketChannelFactoryIo);
+void main() {
+  testMain(webSocketChannelFactoryIo);
 }

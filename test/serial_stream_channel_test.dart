@@ -7,10 +7,10 @@ import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 import 'package:tekartik_serial_wss_sim/serial_wss_sim.dart';
 
 void main() {
-  test_main(webSocketChannelFactoryMemory);
+  testMain(webSocketChannelFactoryMemory);
 }
 
-void test_main(WebSocketChannelFactory channelFactory) {
+void testMain(WebSocketChannelFactory channelFactory) {
   group('serial_stream_channel', () {
     /*
     test('depends', () async {
@@ -30,7 +30,7 @@ void test_main(WebSocketChannelFactory channelFactory) {
 
     test('open_close', () async {
       var server = await SerialServer.start(channelFactory.server, port: 0);
-      Serial serial = new Serial(channelFactory.client.connect(server.url));
+      Serial serial = Serial(channelFactory.client.connect(server.url));
       await serial.connected;
 
       SerialStreamChannel channel =
@@ -44,7 +44,7 @@ void test_main(WebSocketChannelFactory channelFactory) {
       //SerialServer.debug = true;
       //Serial.debug = true;
       var server = await SerialServer.start(channelFactory.server, port: 0);
-      Serial serial = new Serial(channelFactory.client.connect(server.url));
+      Serial serial = Serial(channelFactory.client.connect(server.url));
       await serial.connected;
 
       SerialStreamChannel channel =

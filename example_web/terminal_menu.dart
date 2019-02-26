@@ -8,26 +8,26 @@ import 'package:tekartik_test_menu_browser/test_menu_mdl_browser.dart';
 import 'package:web_socket_channel/html.dart';
 //import 'package:dart2_constant/convert.dart';
 
-terminalMenu() {
+void terminalMenu() {
   Serial serial;
   bool logJson = false;
   bool logRecv = false;
 
-  _connect() async {
+  Future _connect() async {
     try {
       if (serial == null) {
         String url = "ws://localhost:8988";
         write("connecting $url");
-        HtmlWebSocketChannel channel = new HtmlWebSocketChannel.connect(url);
+        HtmlWebSocketChannel channel = HtmlWebSocketChannel.connect(url);
         /*
       channel.stream.listen((message) {
         write('message $message');
       }, onError: (e) => write("error $e"), onDone: () => write("done"));
       */
-        serial = new Serial(channel,
-            clientInfo: new SerialClientInfo()
+        serial = Serial(channel,
+            clientInfo: SerialClientInfo()
               ..name = "serial_wss_client_test_menu"
-              ..version = new Version(0, 1, 0), onDataReceived: (data) {
+              ..version = Version(0, 1, 0), onDataReceived: (data) {
           if (logJson) {
             bool _log = true;
             if (!logRecv) {
@@ -84,7 +84,7 @@ terminalMenu() {
   item('getDevices', () async {
     await _connect();
     List<DeviceInfo> deviceInfos = await serial.getDevices();
-    write("${deviceInfos.length} devices${deviceInfos.length > 0 ? ':' : ''}");
+    write("${deviceInfos.length} devices${deviceInfos.isNotEmpty ? ':' : ''}");
     for (DeviceInfo deviceInfo in deviceInfos) {
       write(deviceInfo.toMap());
     }
@@ -107,7 +107,7 @@ terminalMenu() {
   // for gps smart
   item('connect /dev/ttyUSB0 38400', () async {
     await _connect();
-    ConnectionOptions options = new ConnectionOptions()..bitrate = 38400;
+    ConnectionOptions options = ConnectionOptions()..bitrate = 38400;
     serialStreamChannel =
         await serial.createChannel('/dev/ttyUSB0', options: options);
     write(serialStreamChannel);
@@ -142,7 +142,7 @@ terminalMenu() {
   item('serial connect_first', () async {
     await _connect();
     List<DeviceInfo> deviceInfos = await serial.getDevices();
-    if (deviceInfos.length > 0) {
+    if (deviceInfos.isNotEmpty) {
       serialStreamChannel = await serial.createChannel(deviceInfos.first.path);
       write("connected: ${serialStreamChannel.connectionInfo.toMap()}");
     } else {
@@ -153,16 +153,16 @@ terminalMenu() {
   item('serial send data', () async {
     if (serialStreamChannel != null) {
       write(
-          "send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId, new Uint8List.fromList("hello from client".codeUnits))}");
+          "send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId, Uint8List.fromList("hello from client".codeUnits))}");
     } else {
       write('not connected');
     }
   });
 
-  _send(String cmd) async {
+  Future _send(String cmd) async {
     if (serialStreamChannel != null) {
       write(
-          "send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId, new Uint8List.fromList(cmd.codeUnits))}");
+          "send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId, Uint8List.fromList(cmd.codeUnits))}");
     } else {
       write('not connected');
     }

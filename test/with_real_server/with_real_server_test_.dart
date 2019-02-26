@@ -12,14 +12,14 @@ import 'package:tekartik_serial_wss_client/service/serial_wss_client_service.dar
 import 'package:tekartik_serial_wss_client/src/common_import.dart';
 
 // Need real server running
-main() {
+void main() {
   group('with_real_server', () {
     test('start_stop', () async {
       //Serial.debug.on = true;
 
-      var completer = new Completer();
+      var completer = Completer();
       SerialWssClientService wssService =
-          new SerialWssClientService(webSocketChannelClientFactoryIo);
+          SerialWssClientService(webSocketChannelClientFactoryIo);
       wssService.start();
       wssService.onConnected.listen((bool connected) async {
         if (connected) {
@@ -42,10 +42,10 @@ main() {
       //SerialStreamChannelService.debug.on = true;
       //Serial.debug.on = true;
 
-      var completer = new Completer();
+      var completer = Completer();
 
       SerialWssClientService wssService =
-          new SerialWssClientService(webSocketChannelClientFactoryIo);
+          SerialWssClientService(webSocketChannelClientFactoryIo);
       wssService.start();
       wssService.onConnected.listen((bool connected) async {
         if (connected) {
@@ -56,11 +56,11 @@ main() {
           } else {
             String path = deviceInfos.first.path;
             SerialStreamChannelService service1 =
-                new SerialStreamChannelService(wssService, path: path);
+                SerialStreamChannelService(wssService, path: path);
             service1.start();
 
             SerialStreamChannelService service2 =
-                new SerialStreamChannelService(wssService, path: path);
+                SerialStreamChannelService(wssService, path: path);
             service2.start();
 
             service2.onOpened.listen((bool opened) {
@@ -83,10 +83,10 @@ main() {
       //SerialStreamChannelService.debug.on = true;
       //Serial.debug.on = true;
 
-      var completer = new Completer();
+      var completer = Completer();
 
       SerialWssClientService wssService =
-          new SerialWssClientService(webSocketChannelClientFactoryIo);
+          SerialWssClientService(webSocketChannelClientFactoryIo);
       wssService.start();
       wssService.onConnected.listen((bool connected) async {
         if (connected) {
@@ -97,12 +97,13 @@ main() {
           } else {
             String path = deviceInfos.first.path;
             SerialStreamChannelService service1 =
-                new SerialStreamChannelService(wssService, path: path);
+                SerialStreamChannelService(wssService, path: path);
             service1.start();
 
-            SerialStreamChannelService service2 =
-                new SerialStreamChannelService(wssService,
-                    path: path, retryDelay: new Duration(milliseconds: 100));
+            SerialStreamChannelService service2 = SerialStreamChannelService(
+                wssService,
+                path: path,
+                retryDelay: const Duration(milliseconds: 100));
             service2.start();
 
             bool wasBusy;

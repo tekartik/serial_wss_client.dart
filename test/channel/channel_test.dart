@@ -7,11 +7,11 @@ import 'package:tekartik_web_socket/web_socket.dart';
 
 //import 'package:tekartik_serial_wss_client/channel/channel.dart';
 
-main() {
-  channel_test_main(webSocketChannelFactoryMemory);
+void main() {
+  channelTestMain(webSocketChannelFactoryMemory);
 }
 
-channel_test_main(WebSocketChannelFactory channelFactory) {
+void channelTestMain(WebSocketChannelFactory channelFactory) {
   group("channel", () {
     group("simple", () {
       WebSocketChannelServer<List<int>> server;
@@ -25,10 +25,10 @@ channel_test_main(WebSocketChannelFactory channelFactory) {
 
         //wsClient.stream.listen(onData)
 
-        Completer serverDoneCompleter = new Completer();
-        Completer clientDoneCompleter = new Completer();
-        Completer masterReceiveCompleter = new Completer();
-        Completer slaveReceiveCompleter = new Completer();
+        Completer serverDoneCompleter = Completer();
+        Completer clientDoneCompleter = Completer();
+        Completer masterReceiveCompleter = Completer();
+        Completer slaveReceiveCompleter = Completer();
 
         wsServer.sink.add([1, 2, 3, 4]);
         wsClient.sink.add([5, 6, 7, 8]);

@@ -22,7 +22,7 @@ abstract class Message {
   // throw or return valid value
   static Message parseMap(Map<String, dynamic> map) {
     if (map['jsonrpc'] != "2.0") {
-      throw new FormatException("missing 'jsonrpc=2.0' in $map");
+      throw FormatException("missing 'jsonrpc=2.0' in $map");
     }
 
     if (map.containsKey('id')) {
@@ -30,27 +30,27 @@ abstract class Message {
       if (map['method'] == null) {
         // response
         if (map.containsKey('result')) {
-          return new Response(id, map['result']);
+          return Response(id, map['result']);
         } else {
-          Map errorMap = map['error'];
+          final errorMap = map['error'] as Map;
           if (errorMap == null) {
-            throw new FormatException(
+            throw FormatException(
                 "missing 'method', 'result' or 'error' in $map");
           }
-          return new ErrorResponse(
+          return ErrorResponse(
               id,
-              new Error(errorMap['code'] as int, errorMap['message'] as String,
+              Error(errorMap['code'] as int, errorMap['message'] as String,
                   errorMap['data']));
         }
       } else {
-        return new Request(id, map['method'] as String, map['params']);
+        return Request(id, map['method'] as String, map['params']);
       }
     } else {
       // notification
       if (map['method'] == null) {
-        throw new FormatException("missing 'method' or 'id' in $map");
+        throw FormatException("missing 'method' or 'id' in $map");
       }
-      return new Notification(map['method'] as String, map['params']);
+      return Notification(map['method'] as String, map['params']);
     }
   }
 }
@@ -83,14 +83,14 @@ class Notification extends Message with _RequestMixin {
 class _RequestMixin {
   var _params;
   String _method;
-  get params => _params;
+  dynamic get params => _params;
   String get method => _method;
-  _init(String method, [var params]) {
+  void _init(String method, [var params]) {
     _method = method;
     _params = params;
   }
 
-  _updateMap(Map map) {
+  void _updateMap(Map map) {
     map['method'] = _method;
     if (_params != null) {
       map['params'] = _params;
@@ -153,6 +153,7 @@ class Error {
   }
 
   // override
+  @override
   String toString() {
     return "$code: $message${data != null ? " $data" : ""}";
   }
