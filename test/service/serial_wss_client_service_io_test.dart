@@ -1,4 +1,4 @@
-@TestOn("vm")
+@TestOn('vm')
 import 'dart:async';
 import 'dart:core' hide Error;
 
@@ -19,26 +19,24 @@ void main() {
 
   group('client_service_io', () {
     test('default', () async {
-      SerialWssClientService service =
-          SerialWssClientService(webSocketChannelClientFactoryIo);
+      var service = SerialWssClientService(webSocketChannelClientFactoryIo);
       expect(service.url, getSerialWssUrl());
       await service.changeUrl(null);
       expect(service.url, getSerialWssUrl());
     });
 
     test('invalid_url', () async {
-      SerialWssClientService service =
-          SerialWssClientService(webSocketChannelClientFactoryIo, url: "dummy");
+      var service =
+          SerialWssClientService(webSocketChannelClientFactoryIo, url: 'dummy');
       service.start();
-      await service.changeUrl("another dummy");
+      await service.changeUrl('another dummy');
       await service.stop();
     });
     // needed for url test
     test('start_stop', () async {
       var server =
           await SerialServer.start(webSocketChannelFactoryIo.server, port: 0);
-      SerialWssClientService service = SerialWssClientService(
-          webSocketChannelClientFactoryIo,
+      var service = SerialWssClientService(webSocketChannelClientFactoryIo,
           url: getSerialWssUrl(port: server.port));
       var completer = Completer();
       expect(service.url, getSerialWssUrl(port: server.port));
@@ -65,7 +63,7 @@ void main() {
 
       var clientChannelFactory =
           smartWebSocketChannelClientFactory(webSocketChannelFactoryIo.client);
-      SerialWssClientService service =
+      var service =
           SerialWssClientService(clientChannelFactory, url: server1.url);
       service.start();
 

@@ -15,15 +15,14 @@ void wssStreamChannelServiceMenu(
   SerialWssClientService.debug.on = true;
   // ignore: deprecated_member_use
   SerialStreamChannelService.debug.on = true;
-  SerialWssClientService wssClientService = SerialWssClientService(
+  var wssClientService = SerialWssClientService(
       clientChannelFactory); //, url: serialWssUrlDefault);
-  SerialStreamChannelService service =
-      SerialStreamChannelService(wssClientService);
+  var service = SerialStreamChannelService(wssClientService);
 
   wssClientService.onConnected.listen((bool connected) async {
-    write("connected $connected");
+    write('connected $connected');
     if (connected) {
-      List<DeviceInfo> deviceInfos = await wssClientService.serial.getDevices();
+      var deviceInfos = await wssClientService.serial.getDevices();
       write(deviceInfos);
       if (path == null) {
         path = listFirst(deviceInfos)?.path;
@@ -33,31 +32,31 @@ void wssStreamChannelServiceMenu(
   });
 
   service.onOpened.listen((bool opened) {
-    write("opened  $opened");
+    write('opened  $opened');
   });
 
-  item("wss client service start", () {
+  item('wss client service start', () {
     wssClientService.start();
   });
 
-  item("wss client service stop", () {
+  item('wss client service stop', () {
     wssClientService.stop();
   });
 
-  item("select path", () async {
-    path = await prompt("path");
+  item('select path', () async {
+    path = await prompt('path');
     await service.changeConnection(path);
   });
 
-  item("service start", () {
+  item('service start', () {
     service.start();
   });
 
-  item("service stop", () {
+  item('service stop', () {
     service.stop();
   });
 
-  item("start all services", () {
+  item('start all services', () {
     wssClientService.start();
     service.start();
   });

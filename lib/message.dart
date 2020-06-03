@@ -16,12 +16,12 @@ const methodInfo = 'info'; // from server upon connection, notification
 
 abstract class Message {
   Map<String, dynamic> toMap() {
-    return {"jsonrpc": "2.0"};
+    return {'jsonrpc': '2.0'};
   }
 
   // throw or return valid value
   static Message parseMap(Map<String, dynamic> map) {
-    if (map['jsonrpc'] != "2.0") {
+    if (map['jsonrpc'] != '2.0') {
       throw FormatException("missing 'jsonrpc=2.0' in $map");
     }
 
@@ -116,7 +116,7 @@ class DataRequest extends Request {
   List<int> data;
   DataRequest(id, String method, this.connectionId, this.data)
       : super(id, method) {
-    _params = {"connectionId": connectionId, "data": toHexString(data)};
+    _params = {'connectionId': connectionId, 'data': toHexString(data)};
   }
 }
 
@@ -145,7 +145,7 @@ class Error {
   Error(this.code, this.message, [this.data]);
 
   Map<String, dynamic> toMap() {
-    var map = {"code": code, "message": message};
+    var map = {'code': code, 'message': message};
     if (data != null) {
       map['data'] = data;
     }
@@ -155,7 +155,7 @@ class Error {
   // override
   @override
   String toString() {
-    return "$code: $message${data != null ? " $data" : ""}";
+    return '$code: $message${data != null ? ' $data' : ''}';
   }
 }
 

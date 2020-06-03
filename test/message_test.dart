@@ -7,99 +7,99 @@ void main() {
   group('message', () {
     group('create', () {
       test('request', () {
-        Request request = Request(1, "test", ["value"]);
+        var request = Request(1, 'test', ['value']);
         expect(request.toMap(), {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "method": "test",
-          "params": ["value"]
+          'jsonrpc': '2.0',
+          'id': 1,
+          'method': 'test',
+          'params': ['value']
         });
 
-        request = Request(1, "test");
-        expect(request.toMap(), {"jsonrpc": "2.0", "id": 1, "method": "test"});
+        request = Request(1, 'test');
+        expect(request.toMap(), {'jsonrpc': '2.0', 'id': 1, 'method': 'test'});
       });
 
       test('notification', () {
-        Notification notification = Notification("test", ["value"]);
+        var notification = Notification('test', ['value']);
         expect(notification.toMap(), {
-          "jsonrpc": "2.0",
-          "method": "test",
-          "params": ["value"]
+          'jsonrpc': '2.0',
+          'method': 'test',
+          'params': ['value']
         });
-        notification = Notification("test");
-        expect(notification.toMap(), {"jsonrpc": "2.0", "method": "test"});
+        notification = Notification('test');
+        expect(notification.toMap(), {'jsonrpc': '2.0', 'method': 'test'});
       });
 
       test('response', () {
-        Response response = Response(1, ["value"]);
+        var response = Response(1, ['value']);
         expect(response.toMap(), {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "result": ["value"]
+          'jsonrpc': '2.0',
+          'id': 1,
+          'result': ['value']
         });
         response = Response(1, null);
-        expect(response.toMap(), {"jsonrpc": "2.0", "id": 1, "result": null});
+        expect(response.toMap(), {'jsonrpc': '2.0', 'id': 1, 'result': null});
       });
 
       test('response_error', () {
-        ErrorResponse response = ErrorResponse(1, Error(2, "msg", "err_data"));
+        var response = ErrorResponse(1, Error(2, 'msg', 'err_data'));
         expect(response.toMap(), {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "error": {"code": 2, "message": "msg", "data": "err_data"}
+          'jsonrpc': '2.0',
+          'id': 1,
+          'error': {'code': 2, 'message': 'msg', 'data': 'err_data'}
         });
-        response = ErrorResponse(1, Error(2, "msg"));
+        response = ErrorResponse(1, Error(2, 'msg'));
         expect(response.toMap(), {
-          "jsonrpc": "2.0",
-          "id": 1,
-          "error": {"code": 2, "message": "msg"}
+          'jsonrpc': '2.0',
+          'id': 1,
+          'error': {'code': 2, 'message': 'msg'}
         });
       });
     });
     group('parse', () {
       test('request', () {
         final request = Message.parseMap({
-          "jsonrpc": "2.0",
-          "id": 1,
-          "method": "test",
-          "params": ["value"]
+          'jsonrpc': '2.0',
+          'id': 1,
+          'method': 'test',
+          'params': ['value']
         }) as Request;
 
         expect(request.id, 1);
-        expect(request.method, "test");
-        expect(request.params, ["value"]);
+        expect(request.method, 'test');
+        expect(request.params, ['value']);
       });
       test('notification', () {
         final notification = Message.parseMap({
-          "jsonrpc": "2.0",
-          "method": "test",
-          "params": ["value"]
+          'jsonrpc': '2.0',
+          'method': 'test',
+          'params': ['value']
         }) as Notification;
 
-        expect(notification.method, "test");
-        expect(notification.params, ["value"]);
+        expect(notification.method, 'test');
+        expect(notification.params, ['value']);
       });
       test('response', () {
         final response = Message.parseMap({
-          "jsonrpc": "2.0",
-          "id": 1,
-          "result": ["value"]
+          'jsonrpc': '2.0',
+          'id': 1,
+          'result': ['value']
         }) as Response;
 
         expect(response.id, 1);
-        expect(response.result, ["value"]);
+        expect(response.result, ['value']);
       });
       test('error_response', () {
         final response = Message.parseMap({
-          "jsonrpc": "2.0",
-          "id": 1,
-          "error": {"code": 2, "message": "msg", "data": "err_data"}
+          'jsonrpc': '2.0',
+          'id': 1,
+          'error': {'code': 2, 'message': 'msg', 'data': 'err_data'}
         }) as ErrorResponse;
 
         expect(response.id, 1);
         expect(response.error.code, 2);
-        expect(response.error.message, "msg");
-        expect(response.error.data, "err_data");
+        expect(response.error.message, 'msg');
+        expect(response.error.data, 'err_data');
       });
     });
   });

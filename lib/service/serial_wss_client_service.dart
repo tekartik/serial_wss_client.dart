@@ -8,7 +8,7 @@ import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 import 'package:tekartik_common_utils/string_utils.dart';
 
 class SerialWssClientService {
-  static DevFlag debug = DevFlag("SerialWssClientService debug");
+  static DevFlag debug = DevFlag('SerialWssClientService debug');
   // the serial service when connected
   Serial get serial => _serial;
 
@@ -17,7 +17,7 @@ class SerialWssClientService {
   bool _shouldStop = false;
   Duration _retryDelay;
   final WebSocketChannelClientFactory _factory;
-  Lock _lock = Lock();
+  final Lock _lock = Lock();
   bool _isStarted = false;
 
   bool get isStarted => _isStarted;
@@ -50,7 +50,7 @@ class SerialWssClientService {
   //_onErrorController = new StreamController.broadcast()
   {
     _url = url;
-    this._retryDelay = retryDelay ?? const Duration(seconds: 3);
+    _retryDelay = retryDelay ?? const Duration(seconds: 3);
   }
 
   // must be started explicitely
@@ -66,7 +66,7 @@ class SerialWssClientService {
       await _connect();
     } catch (e) {
       if (debug.on) {
-        print("[SerialWssClientService] connect error $e");
+        print('[SerialWssClientService] connect error $e');
       }
       print(e);
     }
@@ -89,9 +89,9 @@ class SerialWssClientService {
     if (!isConnected) {
       await _lock.synchronized(() async {
         if (!isConnected) {
-          String url = this.url; //nonEmpty(this._url);
+          var url = this.url; //nonEmpty(this._url);
           if (debug.on) {
-            print("[SerialWssClientService] connecting ${this.url} ${url}");
+            print('[SerialWssClientService] connecting ${this.url} ${url}');
           }
 
           WebSocketChannel wsChannel;
@@ -102,7 +102,7 @@ class SerialWssClientService {
             rethrow;
           }
 
-          Serial serial =
+          var serial =
               Serial(wsChannel, clientInfo: clientInfo, onDataReceived: (data) {
             /*
       if (logJson) {
@@ -134,12 +134,12 @@ class SerialWssClientService {
             _onConnectErrorController.add(error);
           }, onDone: _onDisconnect);
           await serial.connected;
-          this._serial = serial;
-          this._connectedUrl = url;
+          _serial = serial;
+          _connectedUrl = url;
 
           _onConnectedController.add(true);
           if (debug.on) {
-            print("[SerialWssClientService] connected");
+            print('[SerialWssClientService] connected');
           }
         }
       });
@@ -149,9 +149,9 @@ class SerialWssClientService {
   Future changeUrl(String url) async {
     if (url != _url) {
       if (debug.on) {
-        print("[SerialWssClientService] changing to $url");
+        print('[SerialWssClientService] changing to $url');
       }
-      this._url = url;
+      _url = url;
       await _stop();
       // try connecting right away
       await _tryConnect();

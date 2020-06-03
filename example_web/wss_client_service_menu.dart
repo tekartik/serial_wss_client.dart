@@ -5,17 +5,17 @@ import 'package:tekartik_test_menu_browser/test_menu_mdl_browser.dart';
 void wssClientServiceMenu(WebSocketChannelClientFactory clientChannelFactory) {
   // ignore: deprecated_member_use
   SerialWssClientService.debug.on = true;
-  SerialWssClientService service = SerialWssClientService(
+  var service = SerialWssClientService(
       clientChannelFactory); //, url: serialWssUrlDefault);
 
   service.onConnected.listen((bool connected) {
-    write("connected $connected");
+    write('connected $connected');
   });
-  item("start", () {
+  item('start', () {
     service.start();
   });
 
-  item("stop", () {
+  item('stop', () {
     service.stop();
   });
 }

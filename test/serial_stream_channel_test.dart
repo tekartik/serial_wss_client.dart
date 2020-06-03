@@ -30,11 +30,10 @@ void testMain(WebSocketChannelFactory channelFactory) {
 
     test('open_close', () async {
       var server = await SerialServer.start(channelFactory.server, port: 0);
-      Serial serial = Serial(channelFactory.client.connect(server.url));
+      var serial = Serial(channelFactory.client.connect(server.url));
       await serial.connected;
 
-      SerialStreamChannel channel =
-          await serial.createChannel(serialWssSimMasterPortPath);
+      var channel = await serial.createChannel(serialWssSimMasterPortPath);
       await channel.close();
 
       await server.close();
@@ -44,11 +43,10 @@ void testMain(WebSocketChannelFactory channelFactory) {
       //SerialServer.debug = true;
       //Serial.debug = true;
       var server = await SerialServer.start(channelFactory.server, port: 0);
-      Serial serial = Serial(channelFactory.client.connect(server.url));
+      var serial = Serial(channelFactory.client.connect(server.url));
       await serial.connected;
 
-      SerialStreamChannel channel =
-          await serial.createChannel(serialWssSimMasterPortPath);
+      var channel = await serial.createChannel(serialWssSimMasterPortPath);
       await server.close();
 
       await channel.close();

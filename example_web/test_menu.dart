@@ -20,22 +20,22 @@ void serverMenu() {
 
 void serialMenu() {
   Serial serial;
-  bool logData = false;
+  var logData = false;
 
   Future _connect() async {
     try {
       if (serial == null) {
-        String url = "ws://localhost:8988";
-        write("connecting $url");
-        HtmlWebSocketChannel channel = HtmlWebSocketChannel.connect(url);
+        var url = 'ws://localhost:8988';
+        write('connecting $url');
+        var channel = HtmlWebSocketChannel.connect(url);
         /*
       channel.stream.listen((message) {
         write('message $message');
-      }, onError: (e) => write("error $e"), onDone: () => write("done"));
+      }, onError: (e) => write('error $e'), onDone: () => write('done'));
       */
         serial = Serial(channel,
             clientInfo: SerialClientInfo()
-              ..name = "serial_wss_client_test_menu"
+              ..name = 'serial_wss_client_test_menu'
               ..version = Version(0, 1, 0), onDataReceived: (data) {
           if (logData) {
             write('recv ${data.runtimeType} ${data}');
@@ -50,8 +50,8 @@ void serialMenu() {
           write('connect done');
           serial = null;
         });
-        bool connected = await serial.connected;
-        write("connected $connected");
+        var connected = await serial.connected;
+        write('connected $connected');
       }
     } catch (e) {
       //write(e);
@@ -61,7 +61,7 @@ void serialMenu() {
 
   item('toggle log', () {
     logData = !logData;
-    write('logs ${logData ? "on" : "off"}');
+    write('logs ${logData ? 'on' : 'off'}');
   });
   item('connect', () async {
     await _connect();
@@ -74,25 +74,25 @@ void serialMenu() {
 
   item('getDevices', () async {
     await _connect();
-    List<DeviceInfo> deviceInfos = await serial.getDevices();
-    write("${deviceInfos.length} devices${deviceInfos.isNotEmpty ? ':' : ''}");
-    for (DeviceInfo deviceInfo in deviceInfos) {
+    var deviceInfos = await serial.getDevices();
+    write('${deviceInfos.length} devices${deviceInfos.isNotEmpty ? ':' : ''}');
+    for (var deviceInfo in deviceInfos) {
       write(deviceInfo.toMap());
     }
   });
 
   item('connect_disconnect_first', () async {
     await _connect();
-    List<DeviceInfo> deviceInfos = await serial.getDevices();
+    var deviceInfos = await serial.getDevices();
     if (deviceInfos.isNotEmpty) {
-      ConnectionInfo connectionInfo =
+      var connectionInfo =
           await serial.connect(deviceInfos.first.path);
-      write("connect: ${connectionInfo.toMap()}");
+      write('connect: ${connectionInfo.toMap()}');
 
-      bool result = await serial.disconnect(connectionInfo.connectionId);
-      write("disconnect: ${result}");
+      var result = await serial.disconnect(connectionInfo.connectionId);
+      write('disconnect: ${result}');
     } else {
-      write("no devices");
+      write('no devices');
     }
   });
 
@@ -100,19 +100,19 @@ void serialMenu() {
 
   item('serial connect_first', () async {
     await _connect();
-    List<DeviceInfo> deviceInfos = await serial.getDevices();
+    var deviceInfos = await serial.getDevices();
     if (deviceInfos.isNotEmpty) {
       serialStreamChannel = await serial.createChannel(deviceInfos.first.path);
-      write("connected: ${serialStreamChannel.connectionInfo.toMap()}");
+      write('connected: ${serialStreamChannel.connectionInfo.toMap()}');
     } else {
-      write("no devices");
+      write('no devices');
     }
   });
 
   item('serial send data', () async {
     if (serialStreamChannel != null) {
       serialStreamChannel.sink
-          .add(Uint8List.fromList("hello from client".codeUnits));
+          .add(Uint8List.fromList('hello from client'.codeUnits));
     } else {
       write('not connected');
     }
@@ -128,9 +128,9 @@ void serialMenu() {
 
   item('serial disconnect', () async {
     if (serialStreamChannel != null) {
-      bool result = await serial
+      var result = await serial
           .disconnect(serialStreamChannel.connectionInfo.connectionId);
-      write("disconnect: ${result}");
+      write('disconnect: ${result}');
       //connectionInfo = null;
     } else {
       write('not connected');
@@ -140,9 +140,9 @@ void serialMenu() {
   SerialStreamChannel serialStreamChannelA;
   Future _disconnectNullA() async {
     if (serialStreamChannelA != null) {
-      bool result = await serial
+      var result = await serial
           .disconnect(serialStreamChannelA.connectionInfo.connectionId);
-      write("disconnected: ${result}");
+      write('disconnected: ${result}');
       serialStreamChannelA = null;
     }
   }
@@ -150,8 +150,8 @@ void serialMenu() {
   item('connect null_a', () async {
     await _connect();
     //_disconnectNullA();
-    serialStreamChannelA = await serial.createChannel("/null/a");
-    write("connect: ${serialStreamChannelA.connectionInfo.toMap()}");
+    serialStreamChannelA = await serial.createChannel('/null/a');
+    write('connect: ${serialStreamChannelA.connectionInfo.toMap()}');
   });
 
   item('disconnect null_a', () async {
@@ -163,16 +163,16 @@ void serialMenu() {
     await _connect();
     if (serialStreamChannelA != null) {
       await serial.send(serialStreamChannelA.connectionInfo.connectionId,
-          Uint8List.fromList(utf8.encode("hello from a")));
+          Uint8List.fromList(utf8.encode('hello from a')));
     }
   });
 
   item('send/recv channel null_a', () async {
     await _connect();
     if (serialStreamChannelA != null) {
-      serialStreamChannelA.sink.add("channel_send".codeUnits);
+      serialStreamChannelA.sink.add('channel_send'.codeUnits);
       serialStreamChannelA.stream.listen((List<int> data) {
-        write("channel_recv: $data");
+        write('channel_recv: $data');
       });
     }
   });
@@ -180,9 +180,9 @@ void serialMenu() {
   SerialStreamChannel serialStreamChannelB;
   Future _disconnectNullB() async {
     if (serialStreamChannelB != null) {
-      bool result = await serial
+      var result = await serial
           .disconnect(serialStreamChannelB.connectionInfo.connectionId);
-      write("disconnected: ${result}");
+      write('disconnected: ${result}');
       serialStreamChannelB = null;
     }
   }
@@ -190,8 +190,8 @@ void serialMenu() {
   item('connect null_b', () async {
     await _connect();
     //_disconnectNullA();
-    serialStreamChannelB = await serial.createChannel("/null/b");
-    write("connect: ${serialStreamChannelB.connectionInfo.toMap()}");
+    serialStreamChannelB = await serial.createChannel('/null/b');
+    write('connect: ${serialStreamChannelB.connectionInfo.toMap()}');
   });
 
   item('disconnect null_b', () async {
@@ -203,7 +203,7 @@ void serialMenu() {
     await _connect();
     if (serialStreamChannelB != null) {
       await serial.send(serialStreamChannelB.connectionInfo.connectionId,
-          Uint8List.fromList("hello from a".codeUnits));
+          Uint8List.fromList('hello from a'.codeUnits));
     }
   });
 }

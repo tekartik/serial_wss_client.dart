@@ -12,8 +12,8 @@ void main() {
 }
 
 void channelTestMain(WebSocketChannelFactory channelFactory) {
-  group("channel", () {
-    group("simple", () {
+  group('channel', () {
+    group('simple', () {
       WebSocketChannelServer<List<int>> server;
       WebSocketChannel<List<int>> wsClient;
       WebSocketChannel<List<int>> wsServer;
@@ -25,10 +25,10 @@ void channelTestMain(WebSocketChannelFactory channelFactory) {
 
         //wsClient.stream.listen(onData)
 
-        Completer serverDoneCompleter = Completer();
-        Completer clientDoneCompleter = Completer();
-        Completer masterReceiveCompleter = Completer();
-        Completer slaveReceiveCompleter = Completer();
+        var serverDoneCompleter = Completer();
+        var clientDoneCompleter = Completer();
+        var masterReceiveCompleter = Completer();
+        var slaveReceiveCompleter = Completer();
 
         wsServer.sink.add([1, 2, 3, 4]);
         wsClient.sink.add([5, 6, 7, 8]);
@@ -38,7 +38,7 @@ void channelTestMain(WebSocketChannelFactory channelFactory) {
           //devPrint(data);
           masterReceiveCompleter.complete();
         }, onDone: () {
-          //devPrint("server.onDone");
+          //devPrint('server.onDone');
           serverDoneCompleter.complete();
         }, onError: (e) {
           print('server.onError $e');
@@ -49,7 +49,7 @@ void channelTestMain(WebSocketChannelFactory channelFactory) {
           //devPrint(data);
           slaveReceiveCompleter.complete();
         }, onDone: () {
-          //devPrint("client.onDone");
+          //devPrint('client.onDone');
           clientDoneCompleter.complete();
         }, onError: (e) {
           print('client.onError $e');
@@ -64,29 +64,29 @@ void channelTestMain(WebSocketChannelFactory channelFactory) {
         await clientDoneCompleter.future;
       }
 
-      test("close_server", () async {
+      test('close_server', () async {
         await simpleTest(() async {
           await await server.close();
         });
       });
 
-      test("close_ws_server", () async {
+      test('close_ws_server', () async {
         await simpleTest(() async {
           await await wsServer.sink.close();
         });
       });
 
-      test("close_ws_client", () async {
+      test('close_ws_client', () async {
         await simpleTest(() async {
           await await wsServer.sink.close();
         });
       });
     });
 
-    test("failure_right_away", () async {
-      bool failed = false;
+    test('failure_right_away', () async {
+      var failed = false;
       try {
-        channelFactory.client.connect("dummy");
+        channelFactory.client.connect('dummy');
       } catch (_) {
         failed = true;
       }
@@ -94,16 +94,16 @@ void channelTestMain(WebSocketChannelFactory channelFactory) {
       expect(failed, isTrue);
     });
 
-    test("failure_on_done", () async {
+    test('failure_on_done', () async {
       WebSocketChannel wsClient;
       wsClient =
-          channelFactory.client.connect("${channelFactory.scheme}://dummy");
+          channelFactory.client.connect('${channelFactory.scheme}://dummy');
 
-      bool failed = false;
+      var failed = false;
       try {
         await wsClient.stream.toList();
       } catch (e) {
-        //devPrint("Err: $e");
+        //devPrint('Err: $e');
         failed = true;
       }
 
