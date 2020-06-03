@@ -85,8 +85,7 @@ void serialMenu() {
     await _connect();
     var deviceInfos = await serial.getDevices();
     if (deviceInfos.isNotEmpty) {
-      var connectionInfo =
-          await serial.connect(deviceInfos.first.path);
+      var connectionInfo = await serial.connect(deviceInfos.first.path);
       write('connect: ${connectionInfo.toMap()}');
 
       var result = await serial.disconnect(connectionInfo.connectionId);
