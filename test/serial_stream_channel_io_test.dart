@@ -1,4 +1,4 @@
-@TestOn("vm")
+@TestOn('vm')
 
 import 'dart:core' hide Error;
 
@@ -16,13 +16,12 @@ void main() {
   test('open_close', () async {
     var server =
         await SerialServer.start(webSocketChannelFactoryIo.server, port: 0);
-    Serial serial = Serial(web_socket.webSocketChannelClientFactoryIo.connect(
+    var serial = Serial(web_socket.webSocketChannelClientFactoryIo.connect(
         //getSerialWssUrl(port: server.port)));
         server.url));
     await serial.connected;
 
-    SerialStreamChannel channel =
-        await serial.createChannel(serialWssSimMasterPortPath);
+    var channel = await serial.createChannel(serialWssSimMasterPortPath);
     await channel.close();
 
     await server.close();

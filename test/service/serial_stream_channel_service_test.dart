@@ -1,4 +1,4 @@
-@TestOn("vm")
+@TestOn('vm')
 import 'dart:async';
 import 'dart:core' hide Error;
 
@@ -19,8 +19,7 @@ class EchoSlaveService {}
 void main() {
   group('client_service_memory', () {
     test('default', () async {
-      SerialWssClientService service =
-          SerialWssClientService(webSocketChannelClientFactoryMemory);
+      var service = SerialWssClientService(webSocketChannelClientFactoryMemory);
       expect(service.url, getSerialWssUrl());
       await service.changeUrl(null);
       expect(service.url, getSerialWssUrl());
@@ -34,14 +33,11 @@ void testMain(WebSocketChannelFactory channelFactory) {
     test('basics', () async {
       var server = await SerialServer.start(channelFactory.server, port: 0);
 
-      SerialWssClientService wssService = SerialWssClientService(
-          channelFactory.client,
-          retryDelay: const Duration(milliseconds: 100),
-          url: server.url);
+      var wssService = SerialWssClientService(channelFactory.client,
+          retryDelay: const Duration(milliseconds: 100), url: server.url);
       wssService.start();
 
-      SerialStreamChannelService service = SerialStreamChannelService(
-          wssService,
+      var service = SerialStreamChannelService(wssService,
           path: serialWssSimMasterPortPath);
       expect(service.connectionOptions, isNull);
       expect(service.connectionInfo, isNull);
@@ -60,24 +56,21 @@ void testMain(WebSocketChannelFactory channelFactory) {
       //Serial.debug = true;
       //SerialStreamChannelService.debug.on = true;
       var server = await SerialServer.start(channelFactory.server, port: 0);
-      int port = server.port;
+      var port = server.port;
 
-      SerialWssClientService wssService = SerialWssClientService(
-          channelFactory.client,
-          retryDelay: const Duration(milliseconds: 100),
-          url: server.url);
+      var wssService = SerialWssClientService(channelFactory.client,
+          retryDelay: const Duration(milliseconds: 100), url: server.url);
       wssService.start();
 
-      SerialStreamChannelService service = SerialStreamChannelService(
-          wssService,
+      var service = SerialStreamChannelService(wssService,
           path: serialWssSimMasterPortPath);
       service.start();
 
       unawaited(() async {
-        for (int i = 0; i < 20; i++) {
+        for (var i = 0; i < 20; i++) {
           await sleep(50);
           print(
-              "connected/opened: ${wssService.isConnected}/${service.isOpened}");
+              'connected/opened: ${wssService.isConnected}/${service.isOpened}');
         }
       }());
 
@@ -94,11 +87,10 @@ void testMain(WebSocketChannelFactory channelFactory) {
       //SerialWssClientService.debug.on = true;
       //SerialStreamChannelService.debug.on = true;
       var server = await SerialServer.start(channelFactory.server, port: 0);
-      SerialWssClientService wssService =
+      var wssService =
           SerialWssClientService(channelFactory.client, url: server.url);
       wssService.start();
-      SerialStreamChannelService service = SerialStreamChannelService(
-          wssService,
+      var service = SerialStreamChannelService(wssService,
           path: serialWssSimMasterPortPath);
       service.start();
 
@@ -117,10 +109,9 @@ void testMain(WebSocketChannelFactory channelFactory) {
       //SerialWssClientService.debug.on = true;
       //SerialStreamChannelService.debug.on = true;
       var server = await SerialServer.start(channelFactory.server, port: 0);
-      SerialWssClientService wssService =
+      var wssService =
           SerialWssClientService(channelFactory.client, url: server.url);
-      SerialStreamChannelService service = SerialStreamChannelService(
-          wssService,
+      var service = SerialStreamChannelService(wssService,
           path: serialWssSimMasterPortPath);
       service.start();
 
@@ -140,11 +131,10 @@ void testMain(WebSocketChannelFactory channelFactory) {
       //SerialWssClientService.debug.on = true;
       //SerialStreamChannelService.debug.on = true;
       var server = await SerialServer.start(channelFactory.server, port: 0);
-      SerialWssClientService wssService =
+      var wssService =
           SerialWssClientService(channelFactory.client, url: server.url);
       wssService.start();
-      SerialStreamChannelService service = SerialStreamChannelService(
-          wssService,
+      var service = SerialStreamChannelService(wssService,
           path: serialWssSimMasterPortPath);
       service.start();
 
@@ -172,14 +162,11 @@ void testMain(WebSocketChannelFactory channelFactory) {
       //Serial.debug = true;
       var server = await SerialServer.start(channelFactory.server, port: 0);
 
-      SerialWssClientService wssService = SerialWssClientService(
-          channelFactory.client,
-          retryDelay: const Duration(milliseconds: 100),
-          url: server.url);
+      var wssService = SerialWssClientService(channelFactory.client,
+          retryDelay: const Duration(milliseconds: 100), url: server.url);
       wssService.start();
 
-      SerialStreamChannelService service =
-          SerialStreamChannelService(wssService);
+      var service = SerialStreamChannelService(wssService);
       service.start();
 
       await wssService.waitForConnected(true);
@@ -190,17 +177,14 @@ void testMain(WebSocketChannelFactory channelFactory) {
 
     test('starting_server_after', () async {
       var server = await SerialServer.start(channelFactory.server, port: 0);
-      int port = server.port;
+      var port = server.port;
       await server.close();
 
-      SerialWssClientService wssService = SerialWssClientService(
-          channelFactory.client,
-          retryDelay: const Duration(milliseconds: 100),
-          url: server.url);
+      var wssService = SerialWssClientService(channelFactory.client,
+          retryDelay: const Duration(milliseconds: 100), url: server.url);
       wssService.start();
 
-      SerialStreamChannelService service = SerialStreamChannelService(
-          wssService,
+      var service = SerialStreamChannelService(wssService,
           path: serialWssSimMasterPortPath);
       service.start();
 
@@ -217,14 +201,11 @@ void testMain(WebSocketChannelFactory channelFactory) {
       //Serial.debug.on = true;
       var server = await SerialServer.start(channelFactory.server, port: 0);
 
-      SerialWssClientService wssService = SerialWssClientService(
-          channelFactory.client,
-          retryDelay: const Duration(milliseconds: 100),
-          url: server.url);
+      var wssService = SerialWssClientService(channelFactory.client,
+          retryDelay: const Duration(milliseconds: 100), url: server.url);
       wssService.start();
 
-      SerialStreamChannelService service = SerialStreamChannelService(
-          wssService,
+      var service = SerialStreamChannelService(wssService,
           path: serialWssSimMasterPortPath);
       service.start();
 
@@ -240,23 +221,19 @@ void testMain(WebSocketChannelFactory channelFactory) {
       //Serial.debug.on = true;
       var server = await SerialServer.start(channelFactory.server, port: 0);
 
-      SerialWssClientService wssService = SerialWssClientService(
-          channelFactory.client,
-          retryDelay: const Duration(milliseconds: 100),
-          url: server.url);
+      var wssService = SerialWssClientService(channelFactory.client,
+          retryDelay: const Duration(milliseconds: 100), url: server.url);
       wssService.start();
 
-      SerialStreamChannelService service1 = SerialStreamChannelService(
-          wssService,
+      var service1 = SerialStreamChannelService(wssService,
           path: serialWssSimMasterPortPath);
       service1.start();
 
-      SerialStreamChannelService service2 = SerialStreamChannelService(
-          wssService,
+      var service2 = SerialStreamChannelService(wssService,
           path: serialWssSimMasterPortPath);
       service2.start();
 
-      Completer completer = Completer();
+      var completer = Completer();
       service2.onOpenError.listen((swss.Error error) {
         expect(error.code, swss.errorCodePortBusy);
         if (!completer.isCompleted) {
@@ -270,25 +247,25 @@ void testMain(WebSocketChannelFactory channelFactory) {
     test('service_channel', () async {
       var server = await SerialServer.start(channelFactory.server, port: 0);
 
-      SerialWssClientService wssService =
+      var wssService =
           SerialWssClientService(channelFactory.client, url: server.url);
       wssService.start();
 
-      SerialStreamChannelService master = SerialStreamChannelService(wssService,
+      var master = SerialStreamChannelService(wssService,
           path: serialWssSimMasterPortPath);
       master.start();
 
-      SerialStreamChannelService slave = SerialStreamChannelService(wssService,
+      var slave = SerialStreamChannelService(wssService,
           path: serialWssSimSlavePortPath);
       slave.start();
 
       await master.waitForOpen(true);
       await slave.waitForOpen(true);
 
-      Completer masterReceiveCompleter = Completer();
-      Completer slaveReceiveCompleter = Completer();
-      Completer masterAnotherStreamReceiveCompleter = Completer();
-      Completer masterSinkStreamReceiveCompleter = Completer();
+      var masterReceiveCompleter = Completer();
+      var slaveReceiveCompleter = Completer();
+      var masterAnotherStreamReceiveCompleter = Completer();
+      var masterSinkStreamReceiveCompleter = Completer();
 
       slave.channel.sink.add([5, 6, 7, 8]);
 

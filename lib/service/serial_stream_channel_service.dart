@@ -32,7 +32,7 @@ class _SerialStreamChannelServiceSink implements StreamSink<List<int>> {
 
   @override
   Future addStream(Stream<List<int>> stream) {
-    Completer completer = Completer();
+    var completer = Completer();
     stream.listen((data) => add(data)).onDone(() {
       completer.complete();
     });
@@ -60,18 +60,18 @@ class _SerialStreamChannel extends StreamChannelMixin<List<int>> {
   Stream<List<int>> get stream => service.stream;
 
   @override
-  String toString() => "${service.currentChannel}";
+  String toString() => '${service.currentChannel}';
 }
 
 class SerialStreamChannelService {
-  static DevFlag debug = DevFlag("SerialStreamChannelService debug");
+  static DevFlag debug = DevFlag('SerialStreamChannelService debug');
 
   // this only happens on close
-  Completer _doneCompleter = Completer();
+  final _doneCompleter = Completer();
 
   Future get done => _doneCompleter.future;
-  Lock _lock = Lock();
-  Lock _openCloseLock = Lock();
+  final _lock = Lock();
+  final _openCloseLock = Lock();
   ConnectionOptions _connectionOptions;
 
   // upon setup
@@ -115,12 +115,12 @@ class SerialStreamChannelService {
   Stream<bool> get onOpened => _onOpenedController.stream;
 
   // exposed to send test data
-  StreamController<List<int>> _streamController;
+  final StreamController<List<int>> _streamController;
 
   //StreamController<List<int>> get streamController => _streamController;
 
   // exposed to get sent data (for history)
-  StreamController<List<int>> _sinkStreamController;
+  final StreamController<List<int>> _sinkStreamController;
 
   Stream<List<int>> get sinkStream => _sinkStreamController.stream;
 
@@ -141,7 +141,7 @@ class SerialStreamChannelService {
         _onOpenErrorController = StreamController.broadcast(),
         _sinkStreamController = StreamController.broadcast(),
         _serialWssClientService = serialWssClientService {
-    this._retryDelay = retryDelay ?? const Duration(seconds: 3);
+    _retryDelay = retryDelay ?? const Duration(seconds: 3);
     _sink = _SerialStreamChannelServiceSink(this);
     _channel = _SerialStreamChannel(this);
     _serialWssClientService.onConnected.listen(_onConnected);

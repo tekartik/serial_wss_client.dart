@@ -10,28 +10,28 @@ import 'package:web_socket_channel/html.dart';
 
 void terminalMenu() {
   Serial serial;
-  bool logJson = false;
-  bool logRecv = false;
+  var logJson = false;
+  var logRecv = false;
 
   Future _connect() async {
     try {
       if (serial == null) {
-        String url = "ws://localhost:8988";
-        write("connecting $url");
-        HtmlWebSocketChannel channel = HtmlWebSocketChannel.connect(url);
+        var url = 'ws://localhost:8988';
+        write('connecting $url');
+        var channel = HtmlWebSocketChannel.connect(url);
         /*
       channel.stream.listen((message) {
         write('message $message');
-      }, onError: (e) => write("error $e"), onDone: () => write("done"));
+      }, onError: (e) => write('error $e'), onDone: () => write('done'));
       */
         serial = Serial(channel,
             clientInfo: SerialClientInfo()
-              ..name = "serial_wss_client_test_menu"
+              ..name = 'serial_wss_client_test_menu'
               ..version = Version(0, 1, 0), onDataReceived: (data) {
           if (logJson) {
-            bool _log = true;
+            var _log = true;
             if (!logRecv) {
-              swss.Message message =
+              var message =
                   swss.Message.parseMap(parseJsonObject(data as String));
               if (message is swss.Notification) {
                 if (message.method == swss.methodReceive) {
@@ -53,8 +53,8 @@ void terminalMenu() {
           write('connect done');
           serial = null;
         });
-        bool connected = await serial.connected;
-        write("connected $connected");
+        var connected = await serial.connected;
+        write('connected $connected');
       }
     } catch (e) {
       //write(e);
@@ -64,12 +64,12 @@ void terminalMenu() {
 
   item('toggle json log', () {
     logJson = !logJson;
-    write('logs ${logJson ? "on" : "off"}');
+    write('logs ${logJson ? 'on' : 'off'}');
   });
 
   item('toggle rcv log', () {
     logRecv = !logRecv;
-    write('logs rcv ${logRecv ? "on" : "off"}');
+    write('logs rcv ${logRecv ? 'on' : 'off'}');
   });
 
   item('connect', () async {
@@ -83,9 +83,9 @@ void terminalMenu() {
 
   item('getDevices', () async {
     await _connect();
-    List<DeviceInfo> deviceInfos = await serial.getDevices();
-    write("${deviceInfos.length} devices${deviceInfos.isNotEmpty ? ':' : ''}");
-    for (DeviceInfo deviceInfo in deviceInfos) {
+    var deviceInfos = await serial.getDevices();
+    write('${deviceInfos.length} devices${deviceInfos.isNotEmpty ? ':' : ''}');
+    for (var deviceInfo in deviceInfos) {
       write(deviceInfo.toMap());
     }
   });
@@ -93,7 +93,7 @@ void terminalMenu() {
   SerialStreamChannel serialStreamChannel;
 
   item('connect', () async {
-    String path = await prompt("Enter serial port path");
+    var path = await prompt('Enter serial port path');
     serialStreamChannel = await serial.createChannel(path);
     write(serialStreamChannel);
   });
@@ -107,7 +107,7 @@ void terminalMenu() {
   // for gps smart
   item('connect /dev/ttyUSB0 38400', () async {
     await _connect();
-    ConnectionOptions options = ConnectionOptions()..bitrate = 38400;
+    var options = ConnectionOptions()..bitrate = 38400;
     serialStreamChannel =
         await serial.createChannel('/dev/ttyUSB0', options: options);
     write(serialStreamChannel);
@@ -124,7 +124,7 @@ void terminalMenu() {
   item('toggle recv data lines log', () {
     if (dataSubscription != null) {
       dataSubscription.cancel();
-      write("subscription cancelled");
+      write('subscription cancelled');
       dataSubscription = null;
     } else if (serialStreamChannel != null) {
       serialStreamChannel.stream
@@ -133,27 +133,27 @@ void terminalMenu() {
           .listen((line) {
         write('line: $line');
       });
-      write("subscribed");
+      write('subscribed');
     } else {
-      write("no connection");
+      write('no connection');
     }
   });
 
   item('serial connect_first', () async {
     await _connect();
-    List<DeviceInfo> deviceInfos = await serial.getDevices();
+    var deviceInfos = await serial.getDevices();
     if (deviceInfos.isNotEmpty) {
       serialStreamChannel = await serial.createChannel(deviceInfos.first.path);
-      write("connected: ${serialStreamChannel.connectionInfo.toMap()}");
+      write('connected: ${serialStreamChannel.connectionInfo.toMap()}');
     } else {
-      write("no devices");
+      write('no devices');
     }
   });
 
   item('serial send data', () async {
     if (serialStreamChannel != null) {
       write(
-          "send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId, Uint8List.fromList("hello from client".codeUnits))}");
+          'send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId, Uint8List.fromList('hello from client'.codeUnits))}');
     } else {
       write('not connected');
     }
@@ -162,20 +162,20 @@ void terminalMenu() {
   Future _send(String cmd) async {
     if (serialStreamChannel != null) {
       write(
-          "send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId, Uint8List.fromList(cmd.codeUnits))}");
+          'send: ${await serial.send(serialStreamChannel.connectionInfo.connectionId, Uint8List.fromList(cmd.codeUnits))}');
     } else {
       write('not connected');
     }
   }
 
   item('serial send AT+CGPSSTATUS?', () async {
-    await _send("AT+CGPSSTATUS=?\r\n");
+    await _send('AT+CGPSSTATUS=?\r\n');
   });
 
   item('flush', () async {
     if (serialStreamChannel != null) {
       write(
-          "flush: ${await serial.flush(serialStreamChannel.connectionInfo.connectionId)}");
+          'flush: ${await serial.flush(serialStreamChannel.connectionInfo.connectionId)}');
     } else {
       write('not connected');
     }
@@ -183,9 +183,9 @@ void terminalMenu() {
 
   item('serial disconnect', () async {
     if (serialStreamChannel != null) {
-      bool result = await serial
+      var result = await serial
           .disconnect(serialStreamChannel.connectionInfo.connectionId);
-      write("disconnect: ${result}");
+      write('disconnect: ${result}');
       //connectionInfo = null;
     } else {
       write('not connected');

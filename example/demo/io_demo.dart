@@ -1,24 +1,22 @@
-import 'package:tekartik_web_socket_io/web_socket_io.dart';
-import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 import 'package:tekartik_serial_wss_client/service/serial_wss_client_service.dart';
+import 'package:tekartik_web_socket_io/web_socket_io.dart';
 
 Future main() async {
-  SerialWssClientService service =
-      SerialWssClientService(webSocketChannelClientFactoryIo);
+  var service = SerialWssClientService(webSocketChannelClientFactoryIo);
   service.start();
 
   service.onConnected.listen((bool connected) async {
     if (connected) {
-      print("connected");
+      print('connected');
 
-      List<DeviceInfo> deviceInfos = await service.serial.getDevices();
+      var deviceInfos = await service.serial.getDevices();
 
       print(deviceInfos);
-      DeviceInfo deviceInfo = deviceInfos.first;
-      SerialStreamChannel serialStreamChannel =
+      var deviceInfo = deviceInfos.first;
+      var serialStreamChannel =
           await service.serial.createChannel(deviceInfo.path);
 
-      serialStreamChannel.sink.add("hello\r".codeUnits);
+      serialStreamChannel.sink.add('hello\r'.codeUnits);
 
       serialStreamChannel.stream.listen((List<int> data) {
         print('received ${data}');
@@ -27,7 +25,7 @@ Future main() async {
       await serialStreamChannel.close();
       await service.stop();
     } else {
-      print("disconnected");
+      print('disconnected');
     }
   });
 }
