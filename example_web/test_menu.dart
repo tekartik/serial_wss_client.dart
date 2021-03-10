@@ -38,11 +38,11 @@ void serialMenu() {
               ..name = 'serial_wss_client_test_menu'
               ..version = Version(0, 1, 0), onDataReceived: (data) {
           if (logData) {
-            write('recv ${data.runtimeType} ${data}');
+            write('recv ${data.runtimeType} $data');
           }
         }, onDataSent: (data) {
           if (logData) {
-            write('send ${data.runtimeType} ${data}');
+            write('send ${data.runtimeType} $data');
           }
         }, onError: (error) {
           write('connect error: $error');
@@ -89,7 +89,7 @@ void serialMenu() {
       write('connect: ${connectionInfo.toMap()}');
 
       var result = await serial.disconnect(connectionInfo.connectionId);
-      write('disconnect: ${result}');
+      write('disconnect: $result');
     } else {
       write('no devices');
     }
@@ -129,7 +129,7 @@ void serialMenu() {
     if (serialStreamChannel != null) {
       var result = await serial
           .disconnect(serialStreamChannel.connectionInfo.connectionId);
-      write('disconnect: ${result}');
+      write('disconnect: $result');
       //connectionInfo = null;
     } else {
       write('not connected');
@@ -141,7 +141,7 @@ void serialMenu() {
     if (serialStreamChannelA != null) {
       var result = await serial
           .disconnect(serialStreamChannelA.connectionInfo.connectionId);
-      write('disconnected: ${result}');
+      write('disconnected: $result');
       serialStreamChannelA = null;
     }
   }
@@ -181,7 +181,7 @@ void serialMenu() {
     if (serialStreamChannelB != null) {
       var result = await serial
           .disconnect(serialStreamChannelB.connectionInfo.connectionId);
-      write('disconnected: ${result}');
+      write('disconnected: $result');
       serialStreamChannelB = null;
     }
   }
