@@ -19,7 +19,7 @@ Future main() async {
       serialStreamChannel.sink.add('hello\r'.codeUnits);
 
       serialStreamChannel.stream.listen((List<int> data) {
-        print('received ${data}');
+        print('received $data');
       });
 
       await serialStreamChannel.close();

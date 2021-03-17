@@ -40,12 +40,12 @@ void terminalMenu() {
               }
             }
             if (_log) {
-              write('recv ${data.runtimeType} ${data}');
+              write('recv ${data.runtimeType} $data');
             }
           }
         }, onDataSent: (data) {
           if (logJson) {
-            write('send ${data.runtimeType} ${data}');
+            write('send ${data.runtimeType} $data');
           }
         }, onError: (error) {
           write('connect error: $error');
@@ -185,7 +185,7 @@ void terminalMenu() {
     if (serialStreamChannel != null) {
       var result = await serial
           .disconnect(serialStreamChannel.connectionInfo.connectionId);
-      write('disconnect: ${result}');
+      write('disconnect: $result');
       //connectionInfo = null;
     } else {
       write('not connected');

@@ -283,7 +283,7 @@ class SerialServerVersionException implements Exception {
 
   @override
   String toString() {
-    return 'SerialServerVersionException: Server version ${serverVersion} not supported. Version min ${minVersion} required';
+    return 'SerialServerVersionException: Server version $serverVersion not supported. Version min $minVersion required';
   }
 }
 

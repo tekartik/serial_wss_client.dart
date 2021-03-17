@@ -302,7 +302,7 @@ class SerialStreamChannelService {
 
             if (debug.on) {
               print(
-                  '[SerialStreamChannelService] creating channel done ${_currentChannel}');
+                  '[SerialStreamChannelService] creating channel done $_currentChannel');
             }
           } catch (e) {
             if (debug.on) {

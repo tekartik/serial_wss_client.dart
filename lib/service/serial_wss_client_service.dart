@@ -91,7 +91,7 @@ class SerialWssClientService {
         if (!isConnected) {
           var url = this.url; //nonEmpty(this._url);
           if (debug.on) {
-            print('[SerialWssClientService] connecting ${this.url} ${url}');
+            print('[SerialWssClientService] connecting $url');
           }
 
           WebSocketChannel wsChannel;
