@@ -42,9 +42,8 @@ class SerialWssClientService {
   Stream get onConnectError => _onConnectErrorController.stream;
 
   SerialWssClientService(WebSocketChannelClientFactory factory,
-      {String url, SerialClientInfo clientInfo, Duration retryDelay})
-      : clientInfo = clientInfo,
-        _factory = factory,
+      {String url, this.clientInfo, Duration retryDelay})
+      : _factory = factory,
         _onConnectErrorController = StreamController.broadcast(),
         _onConnectedController = StreamController.broadcast()
   //_onErrorController = new StreamController.broadcast()
