@@ -408,8 +408,8 @@ class Serial {
 
   final _serialStreamChannels = <int, SerialStreamChannel>{};
 
-  Function _onDataReceived;
-  Function _onDataSent;
+  Function(dynamic data) _onDataReceived;
+  Function(dynamic data) _onDataSent;
 
   Version serverVersion;
 
@@ -540,10 +540,11 @@ class Serial {
       var message = Message.parseMap(map);
       if (message is Notification) {
         if (message.method == methodReceive) {
-          final connectionId = message.params['connectionId'] as int;
+          var paramsMap = message.params as Map;
+          final connectionId = paramsMap['connectionId'] as int;
           var _serialStreamChannel = _serialStreamChannels[connectionId];
           if (_serialStreamChannel != null) {
-            var data = message.params['data'];
+            var data = paramsMap['data'];
             if (data is String) {
               _serialStreamChannel._streamController.add(parseHexString(data));
             } else if (data is List) {
@@ -555,16 +556,18 @@ class Serial {
             print('nobody to listen to received data');
           }
         } else if (message.method == methodError) {
-          final connectionId = message.params['connectionId'] as int;
+          var paramsMap = message.params as Map;
+          final connectionId = paramsMap['connectionId'] as int;
           var _serialStreamChannel = _serialStreamChannels[connectionId];
           if (_serialStreamChannel != null) {
-            var error = message.params['error'];
+            var error = paramsMap['error'];
             _serialStreamChannel._streamController.addError(error);
           } else {
             print('nobody to listen to error');
           }
         } else if (message.method == methodDisconnected) {
-          final connectionId = message.params['connectionId'] as int;
+          var paramsMap = message.params as Map;
+          final connectionId = paramsMap['connectionId'] as int;
           var _serialStreamChannel = _serialStreamChannels[connectionId];
           if (_serialStreamChannel != null) {
             _serialStreamChannel._close();

@@ -56,7 +56,7 @@ abstract class Message {
 }
 
 abstract class _MessageWithId extends Message {
-  final id;
+  final dynamic id;
   _MessageWithId(this.id);
 
   @override
@@ -81,7 +81,7 @@ class Notification extends Message with _RequestMixin {
 }
 
 class _RequestMixin {
-  var _params;
+  dynamic _params;
   String _method;
   dynamic get params => _params;
   String get method => _method;
@@ -126,7 +126,7 @@ class DataSendRequest extends DataRequest {
 }
 
 class Response extends _MessageWithId {
-  final result;
+  final dynamic result;
   Response(id, this.result) : super(id);
 
   @override
@@ -140,7 +140,7 @@ class Response extends _MessageWithId {
 class Error {
   final int code;
   final String message;
-  final data;
+  final dynamic data;
 
   Error(this.code, this.message, [this.data]);
 
