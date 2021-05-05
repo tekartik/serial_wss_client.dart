@@ -1,10 +1,10 @@
 import 'dart:core' hide Error;
 
 import 'package:dev_test/test.dart';
-import 'package:tekartik_web_socket/web_socket.dart';
 import 'package:tekartik_serial_wss_client/constant.dart';
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 import 'package:tekartik_serial_wss_sim/serial_wss_sim.dart';
+import 'package:tekartik_web_socket/web_socket.dart';
 
 void main() {
   testMain(webSocketChannelFactoryMemory);

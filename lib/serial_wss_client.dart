@@ -8,16 +8,17 @@ library serial_wss_client;
 
 import 'dart:async';
 import 'dart:typed_data';
+
+import 'package:event_bus/event_bus.dart';
 import 'package:pedantic/pedantic.dart';
 import 'package:stream_channel/stream_channel.dart';
+import 'package:tekartik_common_utils/bool_utils.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
+import 'package:tekartik_common_utils/hex_utils.dart';
+import 'package:tekartik_common_utils/json_utils.dart';
 import 'package:tekartik_common_utils/version_utils.dart';
 import 'package:tekartik_serial_wss_client/constant.dart';
 import 'package:tekartik_serial_wss_client/message.dart';
-import 'package:tekartik_common_utils/json_utils.dart';
-import 'package:tekartik_common_utils/bool_utils.dart';
-import 'package:event_bus/event_bus.dart';
-import 'package:tekartik_common_utils/hex_utils.dart';
 
 // Minimum expected server version
 // Best is however 0.6.0 at this point
@@ -32,6 +33,7 @@ class _SerialDoneEvent {}
 // Data broadcasted to listener
 class _SerialDataMapEvent {
   Map<String, dynamic> data;
+
   _SerialDataMapEvent(this.data);
 }
 
@@ -290,6 +292,7 @@ class SerialServerVersionException implements Exception {
 class SerialClientInfo {
   String name;
   Version version;
+
   Map toMap() {
     var map = {'name': name, 'version': version?.toString()};
     return map;
@@ -300,6 +303,7 @@ class _SerialStreamSink implements StreamSink<List<int>> {
   final SerialStreamChannel channel;
 
   Completer doneCompleter = Completer();
+
   _SerialStreamSink(this.channel);
 
   @override
@@ -384,6 +388,7 @@ class Serial {
   bool _done = false;
 
   int _lastRequestId = 0;
+
   int get _nextRequestId {
     if (++_lastRequestId > _maxQueryId) {
       _lastRequestId = 1;
@@ -393,6 +398,7 @@ class Serial {
 
   // receiving data
   StreamSubscription _receiveSubscription;
+
   // receiving info - first step
   StreamSubscription _infoSubscription;
   final _connectedCompleter = Completer<bool>();
@@ -608,6 +614,7 @@ class Serial {
   }
 
   Map<int, Request> connectionIdPendingSendRequests = {};
+
   Future<Response> _sendRequest(Request request) async {
     if (!_connected) {
       if (request.method != methodInit) {

@@ -2,10 +2,10 @@ library test_menu;
 
 import 'dart:typed_data';
 
-import 'package:tekartik_web_socket_browser/web_socket_browser.dart';
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
 //import 'package:tekartik_test_menu/src/common_import.dart';
 import 'package:tekartik_test_menu_browser/test_menu_mdl_browser.dart';
+import 'package:tekartik_web_socket_browser/web_socket_browser.dart';
 import 'package:web_socket_channel/html.dart';
 
 import 'terminal_menu.dart';
