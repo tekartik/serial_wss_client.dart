@@ -3,12 +3,12 @@ import 'dart:async';
 import 'dart:core' hide Error;
 
 import 'package:dev_test/test.dart';
-import 'package:tekartik_web_socket_io/web_socket_io.dart';
-import 'package:tekartik_web_socket/src/web_socket_memory.dart';
 import 'package:tekartik_serial_wss_client/constant.dart';
 import 'package:tekartik_serial_wss_client/service/serial_wss_client_service.dart';
 import 'package:tekartik_serial_wss_client/src/common_import.dart';
 import 'package:tekartik_serial_wss_sim/serial_wss_sim.dart';
+import 'package:tekartik_web_socket/src/web_socket_memory.dart';
+import 'package:tekartik_web_socket_io/web_socket_io.dart';
 
 import 'serial_wss_client_service_test.dart';
 

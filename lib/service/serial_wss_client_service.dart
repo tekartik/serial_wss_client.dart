@@ -1,11 +1,12 @@
 import 'dart:async';
+
 import 'package:synchronized/synchronized.dart';
 import 'package:tekartik_common_utils/async_utils.dart';
 import 'package:tekartik_common_utils/dev_utils.dart';
-import 'package:tekartik_web_socket/web_socket.dart';
+import 'package:tekartik_common_utils/string_utils.dart';
 import 'package:tekartik_serial_wss_client/constant.dart';
 import 'package:tekartik_serial_wss_client/serial_wss_client.dart';
-import 'package:tekartik_common_utils/string_utils.dart';
+import 'package:tekartik_web_socket/web_socket.dart';
 
 class SerialWssClientService {
   static DevFlag debug = DevFlag('SerialWssClientService debug');
